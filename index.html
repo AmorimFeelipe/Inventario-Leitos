@@ -369,23 +369,26 @@
       .data-table th, .data-table td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
       .data-table th { background: #f8fafc; font-size: 12px; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; }
 
-      /* --- MOBILE CORREÇÕES --- */
+      /* --- MOBILE CORREÇÕES (Menu Lateral) --- */
       @media (max-width: 768px) {
         .sidebar {
           position: fixed; 
-          left: -100%; /* Escondido por padrão */
+          left: 0; /* Fixado na esquerda */
           top: 0; 
           bottom: 0;
           width: 85%; 
           max-width: 320px;
           box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+          
+          /* Estado Fechado: Move 100% da própria largura para a esquerda */
+          transform: translateX(-100%); 
           transition: transform 0.3s ease;
-          transform: translateX(0); /* Reset transform */
+          z-index: 1100; /* Garante que fique acima de tudo */
         }
         
-        /* Classe ativa para abrir o menu */
+        /* Estado Aberto: Volta para a posição original (0) */
         .sidebar.active {
-          transform: translateX(100%);
+          transform: translateX(0);
         }
         
         .close-sidebar-btn { display: block; }
