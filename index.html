@@ -1001,11 +1001,14 @@
         signInWithCustomToken,
         onAuthStateChanged,
       } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+      // AQUI ESTÁ A MUDANÇA: Adicionei 'getDoc' na lista abaixo
       import {
         getFirestore,
         collection,
         onSnapshot,
         setDoc,
+        getDoc, // <--- ADICIONADO AQUI
         doc,
         serverTimestamp,
         setLogLevel,
@@ -1518,69 +1521,96 @@
         }
       });
 
-      // Evento de Submissão do Formulário
+      // Evento de Submissão do Formulário (CORRIGIDO PARA NÃO SOBRESCREVER)
       addUnitForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        // 1. Coletar dados da Unidade
+        // 1. Coletar dados básicos
         const unitName = unitNameInput.value.trim();
         const unitCategory = unitCategorySelect.value;
-        const unitId = unitName.toLowerCase().replace(/[^a-z0-9]+/g, "-"); // ID amigável
+        const unitId = unitName.toLowerCase().replace(/[^a-z0-9]+/g, "-"); // ID baseado no nome
 
-        // 2. Coletar o Inventário de Leitos
-        const inventory = [];
+        // 2. Coletar o Inventário do Formulário (o que o usuário digitou agora)
+        const newInventory = [];
         const bedRows = bedInventoryInputs.querySelectorAll(".bed-input-row");
         let formValid = true;
 
         bedRows.forEach((row) => {
           const typeInput = row.querySelector(".bed-type");
           const qtdInput = row.querySelector(".bed-qtd");
-
           const type = typeInput.value.trim();
           const quantity = parseInt(qtdInput.value, 10);
 
           if (type && quantity > 0) {
-            inventory.push({ type, quantity });
+            newInventory.push({ type, quantity });
           } else if ((!type && quantity > 0) || (type && quantity <= 0)) {
-            formValid = false; // Se um campo estiver preenchido e o outro não, é inválido
+            formValid = false;
           }
         });
 
-        if (!formValid || inventory.length === 0) {
-          alert(
-            "Por favor, preencha todos os tipos de leito e quantidades corretamente (quantidade deve ser maior que 0)."
-          );
+        if (!formValid || newInventory.length === 0) {
+          alert("Por favor, preencha corretamente os tipos de leito.");
           return;
         }
 
-        // 3. Montar o Objeto de Dados para o Firestore
-        const unitData = {
-          name: unitName,
-          category: unitCategory,
-          inventory: inventory,
-          totalBeds: calculateTotalBeds(inventory),
-          lastUpdated: serverTimestamp(),
-          userId: userId,
-        };
-
-        // 4. Salvar no Firestore
         try {
-          // Caminho: /artifacts/{appId}/public/data/hospital_inventory/{unitId}
+          // 3. Verificar se a unidade já existe para fazer o MERGE (Mesclagem)
           const docRef = doc(
             db,
             `artifacts/${appId}/public/data/hospital_inventory`,
             unitId
           );
+          const docSnap = await getDoc(docRef);
+
+          let finalInventory = [...newInventory]; // Começa com os novos
+
+          if (docSnap.exists()) {
+            const existingData = docSnap.data();
+            const oldInventory = existingData.inventory || [];
+
+            // Lógica de Mesclagem:
+            // Percorre o inventário ANTIGO.
+            // Se o tipo NÃO estiver no novo (formulário), mantemos o antigo.
+            // Se estiver no novo, o novo já está em 'finalInventory' e vai prevalecer (atualizar qtd).
+
+            oldInventory.forEach((oldItem) => {
+              // Verifica se esse tipo antigo existe no novo inventário
+              const existsInNew = newInventory.some(
+                (newItem) =>
+                  newItem.type.toLowerCase() === oldItem.type.toLowerCase()
+              );
+
+              // Se NÃO existe no formulário novo, precisamos PRESERVAR o item antigo
+              if (!existsInNew) {
+                finalInventory.push(oldItem);
+              }
+            });
+          }
+
+          // 4. Calcular o novo total
+          const totalBeds = finalInventory.reduce(
+            (sum, item) => sum + (item.quantity || 0),
+            0
+          );
+
+          // 5. Montar o objeto final
+          const unitData = {
+            name: unitName,
+            category: unitCategory,
+            inventory: finalInventory, // Lista combinada
+            totalBeds: totalBeds,
+            lastUpdated: serverTimestamp(),
+            userId: userId,
+          };
+
+          // 6. Salvar no Firestore
           await setDoc(docRef, unitData);
 
           closeModal();
-          // O onSnapshot cuidará de atualizar a UI
-          console.log("Unidade salva com sucesso. ID:", unitId);
+          console.log("Unidade atualizada com sucesso (Merge realizado).");
         } catch (error) {
           console.error("Erro ao salvar dados no Firestore:", error);
-          alert(
-            "Erro ao salvar no banco de dados. Tente novamente ou verifique a conexão."
-          );
+          alert("Erro ao salvar no banco de dados: " + error.message);
         }
       });
 
