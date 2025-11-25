@@ -88,7 +88,7 @@
           background: none;
           border: none;
           color: white;
-          font-size: 32px; /* Botão maior para facilitar o toque */
+          font-size: 32px;
           cursor: pointer;
           display: none; 
           padding: 0 10px;
@@ -146,7 +146,7 @@
         width: 100%;
       }
       
-      /* Overlay Escuro para quando o menu abrir no mobile */
+      /* Overlay Escuro */
       .overlay-backdrop {
           position: fixed; top:0; left:0; width:100%; height:100%;
           background: rgba(0,0,0,0.5); z-index: 900;
@@ -373,22 +373,21 @@
       @media (max-width: 768px) {
         .sidebar {
           position: fixed; 
-          left: 0; /* Fixado na esquerda */
+          left: 0; 
           top: 0; 
           bottom: 0;
           width: 85%; 
           max-width: 320px;
           box-shadow: 4px 0 20px rgba(0,0,0,0.2);
           
-          /* Estado Fechado: Move 100% da própria largura para a esquerda */
-          transform: translateX(-100%); 
+          transform: translateX(-100%); /* Escondido */
           transition: transform 0.3s ease;
-          z-index: 1100; /* Garante que fique acima de tudo */
+          z-index: 1100; 
         }
         
-        /* Estado Aberto: Volta para a posição original (0) */
+        /* Estado Aberto */
         .sidebar.active {
-          transform: translateX(0);
+          transform: translateX(0); /* Visível */
         }
         
         .close-sidebar-btn { display: block; }
@@ -450,7 +449,7 @@
           
           <span id="text-fallback" style="display:none; font-weight:800; font-size:16px; margin-right:10px; color:var(--accent-primary);">SES-AM</span>
 
-          <span class="page-title">Capacidade Instalada</span>
+          <span class="page-title">Total de Leitos</span>
         </div>
         
         <div class="header-right">
@@ -601,9 +600,9 @@
             }
         }
 
-        // Update KPIs
+        // CORREÇÃO: KPIs agora usam 'filtered' em vez de 'units'
         let t=0, u=0, o=0, c=0;
-        units.forEach(unit => unit.inventory.forEach(i => {
+        filtered.forEach(unit => unit.inventory.forEach(i => {
             let q = +i.quantity || 0; t+=q;
             let type = i.type.toLowerCase();
             if(type.includes('uti')) u+=q;
