@@ -1002,6 +1002,7 @@
         doc,
         serverTimestamp,
         setLogLevel,
+        enableIndexedDbPersistence,
       } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
       // =========================================================================
@@ -1123,6 +1124,22 @@
 
           app = initializeApp(firebaseConfig);
           db = getFirestore(app);
+
+          // --- NOVO CÓDIGO: ATIVAR MODO OFFLINE ---
+          try {
+            await enableIndexedDbPersistence(db);
+            console.log("Persistência offline ativada!");
+          } catch (err) {
+            if (err.code == "failed-precondition") {
+              console.warn(
+                "Múltiplas abas abertas. A persistência só funciona em uma."
+              );
+            } else if (err.code == "unimplemented") {
+              console.warn("Navegador não suporta persistência offline.");
+            }
+          }
+          // ----------------------------------------
+
           auth = getAuth(app);
 
           // 1. Autenticação (Custom Token ou Anônima)
