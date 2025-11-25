@@ -2,11 +2,13 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Inventário de Leitos - Capacidade Instalada - SES-AM</title>
 
     <link rel="manifest" href="manifest.json" />
-
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
@@ -14,30 +16,25 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-      /*
-        ESQUEMA DE CORES ATUALIZADO (Baseado na Logo SES-AM/AMAZONAS):
-        - AZUL ESCURO: #004D99 (Principal para Textos)
-        - VERDE VIBRANTE: #4C9A2A (Cor de Destaque/Ações)
-        */
       :root {
         --bg-body: #f8fafc;
-        --bg-sidebar: #0f172a; /* Azul muito escuro para contraste */
+        --bg-sidebar: #0f172a;
         --bg-card: #ffffff;
-        --text-primary: #004d99; /* Novo Azul Escuro SES */
+        --text-primary: #004d99;
         --text-secondary: #64748b;
-        --accent-primary: #4c9a2a; /* Novo Verde Amazonas */
-        --accent-dark: #37731f; /* Verde um pouco mais escuro para hover */
+        --accent-primary: #4c9a2a;
+        --accent-dark: #37731f;
+        --danger: #ef4444; /* Vermelho para excluir */
 
-        /* Type Colors (Inventário) */
         --tag-uti: #fef2f2;
         --tag-text-uti: #b91c1c;
-        --tag-clinico: #e0f2fe; /* Mais suave que o original */
+        --tag-clinico: #e0f2fe;
         --tag-text-clinico: #0369a1;
 
         --border-color: #e2e8f0;
         --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        --sidebar-width: 260px;
         --header-height: 64px;
+        --sidebar-width: 260px;
       }
 
       * {
@@ -45,6 +42,7 @@
         margin: 0;
         padding: 0;
         outline: none;
+        -webkit-tap-highlight-color: transparent;
       }
 
       body {
@@ -56,7 +54,7 @@
         display: flex;
       }
 
-      /* Sidebar */
+      /* --- SIDEBAR --- */
       .sidebar {
         width: var(--sidebar-width);
         background-color: var(--bg-sidebar);
@@ -66,8 +64,15 @@
         padding: 20px;
         flex-shrink: 0;
         transition: transform 0.3s ease;
-        z-index: 50;
-        position: relative;
+        z-index: 1000;
+        height: 100%;
+      }
+
+      .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
       }
 
       .brand {
@@ -76,12 +81,10 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-bottom: 40px;
         color: white;
-        letter-spacing: -0.5px;
       }
 
-      /* Ícone de Leito/Caixa para manter a estética */
+      /* Ícone Cruz Hospitalar */
       .brand-icon {
         width: 36px;
         height: 36px;
@@ -89,15 +92,25 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
-        background: var(--accent-primary); /* Usa o Verde */
+        background: var(--accent-primary);
+      }
+
+      .close-sidebar-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+        display: none; /* Só aparece no mobile */
+        padding: 0 10px;
       }
 
       .nav-menu {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 6px;
         flex: 1;
+        overflow-y: auto;
       }
 
       .nav-item {
@@ -114,39 +127,41 @@
       }
 
       .nav-item:hover {
-        background-color: rgba(255, 255, 255, 0.05);
+        background-color: rgba(255, 255, 255, 0.1);
         color: white;
       }
       .nav-item.active {
         background-color: var(--accent-primary);
         color: white;
-        box-shadow: 0 4px 12px rgba(76, 154, 42, 0.4); /* Sombra Verde */
+        box-shadow: 0 4px 12px rgba(76, 154, 42, 0.4);
       }
 
-      /* Botão Adicionar */
       .add-btn {
         background-color: var(--accent-primary);
         color: white;
-        padding: 10px 15px;
+        padding: 12px;
         border-radius: 8px;
         font-size: 14px;
         font-weight: 600;
         border: none;
         cursor: pointer;
-        transition: background-color 0.2s;
+        margin-top: 20px;
+        width: 100%;
         box-shadow: 0 4px 12px rgba(76, 154, 42, 0.3);
       }
       .add-btn:hover {
         background-color: var(--accent-dark);
       }
 
-      /* Main Content */
+      /* --- MAIN CONTENT --- */
       .main-wrapper {
         flex: 1;
         display: flex;
         flex-direction: column;
         height: 100vh;
         overflow: hidden;
+        position: relative;
+        width: 100%;
       }
 
       .top-header {
@@ -156,30 +171,19 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 32px;
+        padding: 0 24px;
         flex-shrink: 0;
-      }
-
-      /* Estilos para a Logo no Cabeçalho */
-      .header-logo {
-        max-height: 50px;
-        height: 50px; /* Garante que a altura seja aplicada */
-        margin-right: 15px;
-        width: auto;
-        object-fit: contain; /* Garante que a imagem se ajuste sem cortar */
+        z-index: 50;
       }
 
       .header-left {
         display: flex;
         align-items: center;
+        gap: 15px;
+        flex: 1;
+        overflow: hidden;
       }
 
-      .page-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--text-primary); /* Usa o Azul Escuro */
-        margin-left: 10px;
-      }
       .menu-toggle {
         display: none;
         background: none;
@@ -187,216 +191,227 @@
         font-size: 24px;
         cursor: pointer;
         color: var(--text-primary);
-        padding: 5px;
+      }
+
+      .header-logo {
+        height: 42px;
+        width: auto;
+        object-fit: contain;
+      }
+
+      .page-title {
+        font-size: 18px;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .btn-export {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #f1f5f9;
+        border: 1px solid var(--border-color);
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-export:hover {
+        background: #e2e8f0;
       }
 
       .content-area {
         flex: 1;
         overflow-y: auto;
-        padding: 32px;
+        padding: 24px;
+        scroll-behavior: smooth;
       }
 
-      /* KPI Cards */
+      /* --- KPIS & CHARTS --- */
       .kpi-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 24px;
-        margin-bottom: 32px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
       }
 
       .kpi-card {
         background: var(--bg-card);
-        padding: 24px;
-        border-radius: 16px;
+        padding: 20px;
+        border-radius: 12px;
         border: 1px solid var(--border-color);
         box-shadow: var(--shadow-sm);
       }
-      /* Ajustando ícones KPI para refletir o novo tema */
-      .kpi-icon-wrapper.kpi-total {
-        background: #e0f2fe;
-        color: var(--text-primary);
-      } /* Azul SES */
-      .kpi-icon-wrapper.kpi-uti {
-        background: #fee2e2;
-        color: #dc2626;
-      } /* Vermelho UTI */
-      .kpi-icon-wrapper.kpi-obs {
-        background: #fdf4ff;
-        color: #c026d3;
-      } /* Roxo Obstétrico */
-      .kpi-icon-wrapper.kpi-clin {
-        background: #f0fdf4;
-        color: var(--accent-primary);
-      } /* Verde Amazonas */
 
       .kpi-icon-wrapper {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 16px;
-        font-size: 20px;
+        margin-bottom: 12px;
+        font-size: 18px;
+      }
+      .kpi-total {
+        background: #e0f2fe;
+        color: var(--text-primary);
+      }
+      .kpi-uti {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+      .kpi-obs {
+        background: #fdf4ff;
+        color: #c026d3;
+      }
+      .kpi-clin {
+        background: #f0fdf4;
+        color: var(--accent-primary);
+      }
+
+      .kpi-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text-primary);
       }
       .kpi-label {
-        font-size: 13px;
+        font-size: 12px;
         color: var(--text-secondary);
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 4px;
-      }
-      .kpi-value {
-        font-size: 32px;
-        font-weight: 800;
-        color: var(--text-primary);
-        letter-spacing: -1px;
-      }
-      .kpi-sub {
-        font-size: 12px;
-        color: #94a3b8;
       }
 
-      /* Charts */
       .charts-row {
         display: grid;
         grid-template-columns: 2fr 1fr;
-        gap: 24px;
-        margin-bottom: 32px;
-        height: 380px;
+        gap: 20px;
+        margin-bottom: 30px;
+        height: 350px;
       }
-
       .chart-container {
         background: var(--bg-card);
-        padding: 24px;
-        border-radius: 16px;
+        padding: 20px;
+        border-radius: 12px;
         border: 1px solid var(--border-color);
-        box-shadow: var(--shadow-sm);
         display: flex;
         flex-direction: column;
         overflow: hidden;
-      }
-
-      .chart-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        flex-shrink: 0;
-      }
-      .chart-title {
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--text-primary);
       }
       .chart-wrapper {
         flex: 1;
         position: relative;
         min-height: 0;
-        width: 100%;
       }
 
-      /* Toolbar */
+      /* --- TOOLBAR & CARDS --- */
       .toolbar {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
         flex-wrap: wrap;
         gap: 16px;
+        margin-bottom: 24px;
       }
-
       .search-wrapper {
+        flex: 1;
+        min-width: 200px;
         position: relative;
-        width: 320px;
-        max-width: 100%;
       }
       .search-input {
         width: 100%;
-        padding: 12px 16px 12px 44px;
-        border-radius: 12px;
-        font-size: 14px;
-        background: white;
-        box-shadow: var(--shadow-sm);
+        padding: 12px 12px 12px 40px;
+        border-radius: 10px;
         border: 1px solid var(--border-color);
+        font-size: 14px;
       }
       .search-icon {
         position: absolute;
-        left: 14px;
+        left: 12px;
         top: 50%;
         transform: translateY(-50%);
-        color: var(--text-secondary);
+        color: #94a3b8;
       }
 
-      .view-toggles {
-        display: flex;
-        background: white;
-        padding: 4px;
-        border-radius: 10px;
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow-sm);
-      }
-      .view-btn {
-        padding: 8px 16px;
-        font-size: 13px;
-        font-weight: 600;
-        border: none;
-        background: transparent;
-        color: var(--text-secondary);
-        border-radius: 8px;
-        cursor: pointer;
-      }
-      .view-btn.active {
-        background: #f1f5f9;
-        color: var(--text-primary);
-      }
-
-      /* Grid View Cards */
       .grid-view {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 24px;
       }
+
       .unit-card {
         background: var(--bg-card);
         border: 1px solid var(--border-color);
         border-radius: 16px;
         padding: 24px;
-        transition: all 0.2s;
         display: flex;
         flex-direction: column;
-        height: 100%;
+        transition: transform 0.2s, box-shadow 0.2s;
       }
       .unit-card:hover {
-        transform: translateY(-4px);
+        transform: translateY(-3px);
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
         border-color: var(--accent-primary);
       }
-      .card-top {
+
+      .card-header-row {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 16px;
       }
-      .unit-title h3 {
+
+      .unit-info h3 {
         font-size: 16px;
         font-weight: 700;
-        color: var(--text-primary);
         margin-bottom: 4px;
+        color: var(--text-primary);
       }
-      .unit-cat-badge {
+      .unit-cat {
         font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
+        background: #f1f5f9;
         padding: 4px 8px;
         border-radius: 6px;
-        background: #f1f5f9;
         color: var(--text-secondary);
-        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-weight: 600;
       }
 
-      /* Total Badge com o novo gradiente verde */
+      .card-actions {
+        display: flex;
+        gap: 8px;
+      }
+      .btn-icon-card {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        transition: all 0.2s;
+      }
+      .btn-edit:hover {
+        background: #f0f9ff;
+        border-color: #0ea5e9;
+      }
+      .btn-del:hover {
+        background: #fef2f2;
+        border-color: #ef4444;
+      }
+
       .total-badge {
         background: linear-gradient(
           135deg,
@@ -406,44 +421,36 @@
         color: white;
         padding: 6px 12px;
         border-radius: 8px;
-        font-weight: 700;
-        font-size: 14px;
         text-align: center;
-        min-width: 60px;
+        font-weight: 700;
+        font-size: 16px;
       }
       .total-badge span {
         display: block;
         font-size: 10px;
-        opacity: 0.8;
+        opacity: 0.9;
         font-weight: 500;
         text-transform: uppercase;
       }
 
-      .card-divider {
-        height: 1px;
-        background: #f1f5f9;
-        margin: 16px 0;
-      }
       .types-list {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
+        margin: 12px 0 20px 0;
       }
       .type-tag {
         font-size: 12px;
         padding: 4px 10px;
         border-radius: 6px;
-        font-weight: 500;
+        border: 1px solid transparent;
         display: flex;
-        align-items: center;
         gap: 6px;
+        align-items: center;
       }
       .type-tag b {
-        color: var(--text-primary);
         font-weight: 700;
       }
-
-      /* Specific Tag Colors */
       .tag-uti {
         background: var(--tag-uti);
         color: var(--tag-text-uti);
@@ -455,290 +462,176 @@
         border-color: #e0f2fe;
       }
 
-      /* Table View */
-      .table-container {
-        display: none;
-        background: white;
-        border-radius: 16px;
-        border: 1px solid var(--border-color);
-        overflow: hidden;
-        box-shadow: var(--shadow-sm);
-      }
-      .data-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      .data-table th,
-      .data-table td {
-        padding: 16px 24px;
-        text-align: left;
-      }
-      .data-table th {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        border-bottom: 1px solid var(--border-color);
-        background: #f8fafc;
-      }
-      .data-table td {
-        font-size: 14px;
-        color: var(--text-primary);
-        border-bottom: 1px solid var(--border-color);
-        vertical-align: middle;
-      }
-      .types-cell {
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
-      }
-
-      /* Loading State */
-      .loading-state {
-        text-align: center;
-        padding: 80px 0;
-        font-size: 16px;
-        color: var(--text-secondary);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-      }
-      .spinner {
-        border: 4px solid rgba(0, 0, 0, 0.1);
-        border-top: 4px solid var(--accent-primary); /* Spinner Verde */
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-      }
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-
-      /* Modal Styles */
+      /* --- MODAL --- */
       .modal {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 1000;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 2000;
         display: none;
         justify-content: center;
         align-items: center;
+        padding: 20px;
+        backdrop-filter: blur(4px);
       }
-
       .modal.active {
         display: flex;
       }
-
       .modal-content {
-        background-color: var(--bg-card);
-        padding: 30px;
+        background: white;
+        padding: 24px;
         border-radius: 16px;
-        width: 90%;
-        max-width: 600px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        position: relative;
-        animation: fadeIn 0.3s ease-out;
+        width: 100%;
+        max-width: 550px;
         max-height: 90vh;
         overflow-y: auto;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.3s ease;
       }
-
       @keyframes fadeIn {
         from {
           opacity: 0;
-          transform: scale(0.95) translateY(20px);
+          transform: translateY(20px);
         }
         to {
           opacity: 1;
-          transform: scale(1) translateY(0);
+          transform: translateY(0);
         }
       }
 
-      .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 15px;
-      }
-      .modal-header h2 {
-        font-size: 20px;
-        color: var(--text-primary);
-      }
-      .modal-close {
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: var(--text-secondary);
-      }
-
-      /* Form Styles */
       .form-group {
-        margin-bottom: 15px;
-      }
-      .form-group label {
-        display: block;
-        margin-bottom: 6px;
-        font-weight: 600;
-        font-size: 14px;
-        color: var(--text-primary);
+        margin-bottom: 16px;
       }
       .form-input,
       .form-select {
         width: 100%;
-        padding: 10px;
-        border: 1px solid var(--border-color);
+        padding: 12px;
         border-radius: 8px;
+        border: 1px solid var(--border-color);
         font-size: 14px;
-        transition: border-color 0.2s;
       }
-      .form-input:focus,
-      .form-select:focus {
-        border-color: var(--accent-primary);
-        box-shadow: 0 0 0 2px rgba(76, 154, 42, 0.2);
-      } /* Sombra Verde */
-
       .bed-input-row {
         display: flex;
         gap: 10px;
         margin-bottom: 10px;
         align-items: center;
       }
-      .bed-input-row .bed-type {
-        flex: 3;
-      }
-      .bed-input-row .bed-qtd {
-        flex: 1;
-        text-align: center;
-      }
-
-      .add-bed-btn {
-        background-color: #f1f5f9;
-        color: var(--text-primary);
-        border: 1px solid var(--border-color);
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        font-weight: 500;
-      }
-      .add-bed-btn:hover {
-        background-color: #e2e8f0;
-      }
-
       .remove-bed-btn {
-        flex-shrink: 0;
-        width: 38px;
-        height: 38px;
-        line-height: 1;
-        background-color: #f87171;
-        color: white;
+        width: 40px;
+        height: 42px;
+        background: #fee2e2;
+        color: #dc2626;
         border: none;
-        padding: 0;
         border-radius: 8px;
         cursor: pointer;
+        font-size: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
-      }
-
-      .form-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 20px;
-      }
-      .btn-cancel {
-        background: #cbd5e1;
-        color: #1e293b;
       }
       .btn-save {
         background: var(--accent-primary);
         color: white;
-      } /* Botão Salvar Verde */
-      .btn-form {
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-weight: 600;
         border: none;
+        padding: 14px;
+        border-radius: 8px;
+        width: 100%;
+        font-weight: 600;
         cursor: pointer;
+        font-size: 16px;
         transition: opacity 0.2s;
       }
-      .btn-form:hover {
+      .btn-save:hover {
         opacity: 0.9;
       }
 
-      /* ================================================= */
-      /* MEDIA QUERIES - OTIMIZAÇÃO MOBILE */
-      /* ================================================= */
-      @media (max-width: 1024px) {
+      /* --- TABLE VIEW --- */
+      .table-container {
+        display: none;
+        overflow-x: auto;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+      }
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 600px;
+      }
+      .data-table th,
+      .data-table td {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .data-table th {
+        background: #f8fafc;
+        font-size: 12px;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        font-weight: 600;
+      }
+
+      /* --- MOBILE --- */
+      @media (max-width: 768px) {
+        .sidebar {
+          position: fixed;
+          left: -100%;
+          top: 0;
+          bottom: 0;
+          width: 85%; /* Menu ocupa mais espaço */
+          max-width: 320px;
+          box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+        }
+        .sidebar.open {
+          transform: translateX(100%);
+          left: -85%;
+        }
+        .sidebar.active {
+          transform: translateX(0);
+          left: 0;
+        }
+
+        .close-sidebar-btn {
+          display: block;
+        }
+        .menu-toggle {
+          display: block;
+        }
+
+        .page-title {
+          font-size: 16px;
+          margin-left: 0;
+        }
+        .header-logo {
+          height: 32px;
+        }
+        .top-header {
+          padding: 0 16px;
+        }
+
+        /* Ajuste para quebrar o layout se precisar */
         .charts-row {
           grid-template-columns: 1fr;
           height: auto;
         }
         .chart-container {
-          height: 350px;
-          margin-bottom: 24px;
-        }
-        .sidebar {
-          width: 100%;
-          height: 100%;
-          position: fixed;
-          transform: translateX(-100%);
-          transition: transform 0.3s ease;
-          z-index: 100;
-          padding-top: var(--header-height);
-        }
-        .sidebar.open {
-          transform: translateX(0);
-        }
-        .top-header {
-          padding: 0 16px;
-        }
-        .content-area {
-          padding: 16px;
-        }
-        .menu-toggle {
-          display: block;
-        }
-        .main-wrapper {
-          transition: filter 0.3s ease;
-        }
-        .main-wrapper.blurred {
-          filter: blur(3px);
-          pointer-events: none;
+          height: 300px;
         }
         .toolbar {
-          justify-content: center;
+          flex-direction: column;
+          align-items: stretch;
         }
         .search-wrapper {
-          order: 2;
           width: 100%;
         }
-        .view-toggles {
-          order: 1;
-        }
-        .grid-view {
-          grid-template-columns: 1fr;
-        }
-        .kpi-grid {
-          gap: 16px;
-        }
-        .modal-content {
-          margin: 20px;
+
+        /* User ID hide on mobile */
+        #user-id-display {
+          display: none;
         }
       }
     </style>
@@ -746,62 +639,69 @@
 
   <body>
     <aside class="sidebar" id="sidebar">
-      <div class="brand">
-        <div class="brand-icon">📦</div>
-        <span>Gestão Leitos</span>
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </div>
+          <span>Gestão Leitos</span>
+        </div>
+        <button class="close-sidebar-btn" id="close-sidebar">&times;</button>
       </div>
 
       <nav class="nav-menu">
-        <div class="nav-item active" data-filter="all">
-          <span>🏢 Rede Completa</span>
-        </div>
-        <div class="nav-item" data-filter="Maternidade">
-          <span>👶 Maternidades</span>
-        </div>
-        <div class="nav-item" data-filter="HPS"><span>🚑 HPS</span></div>
-        <div class="nav-item" data-filter="HPSC"><span>🏥 HPSC</span></div>
-        <div class="nav-item" data-filter="Infantil">
-          <span>🧸 Infantil</span>
-        </div>
-        <div class="nav-item" data-filter="UPA"><span>🩺 UPAs</span></div>
-        <div class="nav-item" data-filter="Fundação">
-          <span>🔬 Fundações</span>
-        </div>
-        <div class="nav-item" data-filter="SPA"><span>🩹 SPAs</span></div>
+        <div class="nav-item active" data-filter="all">🏢 Rede Completa</div>
+        <div class="nav-item" data-filter="Maternidade">👶 Maternidades</div>
+        <div class="nav-item" data-filter="HPS">🚑 HPS</div>
+        <div class="nav-item" data-filter="HPSC">🏥 HPSC</div>
+        <div class="nav-item" data-filter="Infantil">🧸 Infantil</div>
+        <div class="nav-item" data-filter="UPA">🩺 UPAs</div>
+        <div class="nav-item" data-filter="Fundação">🔬 Fundações</div>
+        <div class="nav-item" data-filter="SPA">🩹 SPAs</div>
       </nav>
 
-      <button class="add-btn" id="add-unit-btn" style="margin-top: 20px">
-        + Adicionar/Atualizar Unidade
-      </button>
+      <button class="add-btn" id="add-unit-btn">+ Adicionar Unidade</button>
     </aside>
 
     <div class="main-wrapper" id="main-wrapper">
       <header class="top-header">
         <div class="header-left">
           <button class="menu-toggle" id="menu-toggle">☰</button>
-
           <img
             src="image_28787b.png"
-            onerror="this.onerror=null; 
-                             this.src='images.png'; 
-                             this.onerror=function(){ 
-                                 this.onerror=null; 
-                                 this.src='image_2869b5.png'; 
-                             }"
-            alt="Secretaria de Saúde do Amazonas"
+            onerror="this.src='https://via.placeholder.com/150x50?text=SES-AM'"
             class="header-logo"
+            alt="Logo"
           />
-
           <span class="page-title">Inventário de Capacidade</span>
         </div>
-        <div
-          style="
-            font-size: 13px;
-            color: var(--text-secondary);
-            font-weight: 500;
-          "
-        >
-          <span id="user-id-display">Carregando Usuário...</span>
+
+        <div class="header-right">
+          <button class="btn-export" id="btn-export">
+            📥
+            <span
+              style="display: none; @media (min-width: 600px) {display: inline}"
+              >Exportar</span
+            >
+          </button>
+          <div
+            style="font-size: 11px; text-align: right; color: #64748b"
+            id="user-id-display"
+          >
+            Carregando...
+          </div>
         </div>
       </header>
 
@@ -809,126 +709,118 @@
         <div class="kpi-grid">
           <div class="kpi-card">
             <div class="kpi-icon-wrapper kpi-total">🛏️</div>
-            <div class="kpi-label">Total Geral</div>
             <div class="kpi-value" id="kpi-total">0</div>
-            <div class="kpi-sub">Leitos Cadastrados</div>
+            <div class="kpi-label">Total Geral</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-icon-wrapper kpi-uti">❤️</div>
-            <div class="kpi-label">Total UTIs</div>
             <div class="kpi-value" id="kpi-uti">0</div>
-            <div class="kpi-sub">Adulto, Pediátrica e Neo</div>
+            <div class="kpi-label">Total UTIs</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-icon-wrapper kpi-obs">👶</div>
-            <div class="kpi-label">Obstétricos</div>
             <div class="kpi-value" id="kpi-obs">0</div>
-            <div class="kpi-sub">Alcon, Ugar, Ucinca</div>
+            <div class="kpi-label">Obstétricos</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-icon-wrapper kpi-clin">🩺</div>
-            <div class="kpi-label">Clínicos/Gerais</div>
             <div class="kpi-value" id="kpi-clin">0</div>
-            <div class="kpi-sub">Enfermaria e Observação</div>
+            <div class="kpi-label">Clínicos</div>
           </div>
         </div>
 
         <div class="charts-row">
+          <div class="chart-container"><canvas id="barChart"></canvas></div>
           <div class="chart-container">
-            <div class="chart-header">
-              <div class="chart-title">Maiores Capacidades por Unidade</div>
-            </div>
-            <div class="chart-wrapper">
-              <canvas id="barChart"></canvas>
-            </div>
-          </div>
-          <div class="chart-container">
-            <div class="chart-header">
-              <div class="chart-title">Distribuição por Tipo de Leito</div>
-            </div>
-            <div class="chart-wrapper">
-              <canvas id="doughnutChart"></canvas>
-            </div>
+            <canvas id="doughnutChart"></canvas>
           </div>
         </div>
 
         <div class="toolbar">
           <div class="search-wrapper">
-            <i class="search-icon">🔍</i>
+            <span class="search-icon">🔍</span>
             <input
               type="text"
               class="search-input"
               id="search-input"
-              placeholder="Buscar unidade ou tipo de leito..."
+              placeholder="Buscar unidade ou leito..."
             />
           </div>
-          <div class="view-toggles">
-            <button class="view-btn active" id="btn-grid">Cards</button>
-            <button class="view-btn" id="btn-table">Lista</button>
-          </div>
+          <button class="btn-export" id="btn-table-toggle" style="height: 42px">
+            Ver Lista
+          </button>
         </div>
 
-        <div id="data-container">
-          <div id="loading-state" class="loading-state">
-            <div class="spinner"></div>
-            Carregando dados do inventário em tempo real...
-          </div>
-
-          <div id="grid-view" class="grid-view" style="display: none"></div>
-
-          <div id="table-view" class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Unidade</th>
-                  <th>Categoria</th>
-                  <th>Capacidade Total</th>
-                  <th>Detalhamento (Inventário)</th>
-                </tr>
-              </thead>
-              <tbody id="table-body"></tbody>
-            </table>
-          </div>
+        <div id="loading-state" style="text-align: center; padding: 40px">
+          Carregando dados...
         </div>
-
+        <div id="grid-view" class="grid-view"></div>
+        <div id="table-view" class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Unidade</th>
+                <th>Categoria</th>
+                <th>Capacidade</th>
+                <th>Inventário</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
         <div
-          class="empty-state"
           id="empty-state"
-          style="display: none; text-align: center; padding: 60px"
+          style="
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+          "
         >
-          <p style="color: var(--text-secondary); font-size: 16px">
-            Nenhuma unidade encontrada.
-          </p>
+          Nenhuma unidade encontrada.
         </div>
       </div>
     </div>
 
     <div id="add-unit-modal" class="modal">
       <div class="modal-content">
-        <div class="modal-header">
-          <h2>Adicionar/Atualizar Unidade Hospitalar</h2>
-          <button class="modal-close" id="modal-close-btn">&times;</button>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+          "
+        >
+          <h2 id="modal-title" style="font-size: 20px">Adicionar Unidade</h2>
+          <button
+            id="modal-close-btn"
+            style="
+              background: none;
+              border: none;
+              font-size: 28px;
+              cursor: pointer;
+            "
+          >
+            &times;
+          </button>
         </div>
-
         <form id="add-unit-form">
+          <input type="hidden" id="unit-id-hidden" />
           <div class="form-group">
-            <label for="unit-name">Nome da Unidade</label>
+            <label>Nome da Unidade</label>
             <input
               type="text"
               id="unit-name"
               class="form-input"
-              placeholder="Ex: HPS Joãozinho"
+              placeholder="Ex: HPS 28 de Agosto"
               required
             />
-            <small style="color: #64748b"
-              >*Se o nome já existir, os dados serão atualizados.</small
-            >
+            <small id="name-feedback"></small>
           </div>
-
           <div class="form-group">
-            <label for="unit-category">Categoria</label>
+            <label>Categoria</label>
             <select id="unit-category" class="form-select" required>
-              <option value="">Selecione a Categoria</option>
               <option value="HPS">HPS</option>
               <option value="HPSC">HPSC</option>
               <option value="Maternidade">Maternidade</option>
@@ -939,164 +831,56 @@
               <option value="Outro">Outro</option>
             </select>
           </div>
-
           <div class="form-group">
-            <label>Inventário de Leitos (Tipo e Quantidade)</label>
-            <div id="bed-inventory-inputs">
-              <div class="bed-input-row" data-index="0">
-                <input
-                  type="text"
-                  class="form-input bed-type"
-                  placeholder="Tipo (Ex: UTI Adulto)"
-                  required
-                />
-                <input
-                  type="number"
-                  class="form-input bed-qtd"
-                  placeholder="Qtd"
-                  min="1"
-                  required
-                />
-              </div>
-            </div>
-            <button type="button" class="add-bed-btn" id="add-bed-input">
+            <label
+              >Inventário
+              <span style="font-size: 12px; color: #64748b; font-weight: 400"
+                >(Clique no X vermelho para excluir um tipo)</span
+              ></label
+            >
+            <div id="bed-inventory-inputs"></div>
+            <button
+              type="button"
+              id="add-bed-input"
+              style="
+                margin-top: 10px;
+                padding: 10px;
+                width: 100%;
+                border: 1px dashed #ccc;
+                background: #f8fafc;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 500;
+              "
+            >
               + Adicionar Tipo de Leito
             </button>
           </div>
-
-          <div class="form-actions">
-            <button
-              type="button"
-              class="btn-form btn-cancel"
-              id="btn-cancel-form"
-            >
-              Cancelar
-            </button>
-            <button type="submit" class="btn-form btn-save">
-              Salvar/Atualizar Unidade
-            </button>
-          </div>
+          <button type="submit" class="btn-save">Salvar Alterações</button>
         </form>
       </div>
     </div>
 
     <script type="module">
-      // =========================================================================
-      // FIREBASE/FIRESTORE IMPORTS
-      // =========================================================================
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
       import {
         getAuth,
         signInAnonymously,
-        signInWithCustomToken,
         onAuthStateChanged,
       } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-      // IMPORTS CORRETOS (Inclui getDoc)
       import {
         getFirestore,
         collection,
         onSnapshot,
         setDoc,
+        deleteDoc,
         getDoc,
         doc,
         serverTimestamp,
-        setLogLevel,
         enableIndexedDbPersistence,
       } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-      // =========================================================================
-      // VARIÁVEIS GLOBAIS
-      // =========================================================================
-      let app, db, auth;
-      let units = []; // Dados do inventário
-      let userId = null;
-      let chartInstances = {}; // Para gerenciar as instâncias dos gráficos Chart.js
-
-      let currentFilter = "all";
-      let currentSearch = "";
-
-      // Elementos DOM
-      const gridContainer = document.getElementById("grid-view");
-      const tableBody = document.getElementById("table-body");
-      const searchInput = document.getElementById("search-input");
-      const navItems = document.querySelectorAll(".nav-item");
-      const btnGrid = document.getElementById("btn-grid");
-      const btnTable = document.getElementById("btn-table");
-      const tableView = document.getElementById("table-view");
-      const gridView = document.getElementById("grid-view");
-      const loadingState = document.getElementById("loading-state");
-      const userIdDisplay = document.getElementById("user-id-display");
-      const addUnitBtn = document.getElementById("add-unit-btn");
-
-      // Modal DOM
-      const modal = document.getElementById("add-unit-modal");
-      const modalCloseBtn = document.getElementById("modal-close-btn");
-      const btnCancelForm = document.getElementById("btn-cancel-form");
-      const addUnitForm = document.getElementById("add-unit-form");
-      const bedInventoryInputs = document.getElementById(
-        "bed-inventory-inputs"
-      );
-      const addBedInputBtn = document.getElementById("add-bed-input");
-
-      // Form fields
-      const unitNameInput = document.getElementById("unit-name");
-      const unitCategorySelect = document.getElementById("unit-category");
-
-      // =========================================================================
-      // AUTO-PREENCHIMENTO (RECONHECER UNIDADE EXISTENTE) - NOVO!
-      // =========================================================================
-
-      // Elemento para aviso visual
-      const nameFeedback = document.createElement("small");
-      nameFeedback.style.display = "block";
-      nameFeedback.style.marginTop = "4px";
-      nameFeedback.style.fontWeight = "600";
-      // Insere o aviso logo após o input de nome
-      unitNameInput.parentNode.appendChild(nameFeedback);
-
-      unitNameInput.addEventListener("input", () => {
-        const typedName = unitNameInput.value.trim();
-        const searchId = typedName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-
-        if (!searchId) {
-          nameFeedback.textContent = "";
-          return;
-        }
-
-        // Procura na lista local de unidades
-        const foundUnit = units.find((u) => u.id === searchId);
-
-        if (foundUnit) {
-          // SE ACHAR A UNIDADE:
-          nameFeedback.textContent = "✅ Unidade encontrada! Dados carregados.";
-          nameFeedback.style.color = "#4C9A2A"; // Verde
-
-          // Preenche categoria
-          unitCategorySelect.value = foundUnit.category;
-
-          // Limpa e preenche os leitos existentes
-          bedInventoryInputs.innerHTML = "";
-          if (foundUnit.inventory && foundUnit.inventory.length > 0) {
-            foundUnit.inventory.forEach((item, index) => {
-              addBedInput(index, item.type, item.quantity);
-            });
-          } else {
-            addBedInput(0);
-          }
-        } else {
-          // SE FOR NOVA:
-          nameFeedback.textContent = "✨ Nova Unidade (será criada)";
-          nameFeedback.style.color = "#64748b"; // Cinza
-        }
-      });
-
-      // =========================================================================
-      // FIREBASE SETUP E AUTENTICAÇÃO
-      // =========================================================================
-
-      const appId = "gestao-leitos-web";
-
+      // CONFIGURAÇÃO FIREBASE
       const firebaseConfig = {
         apiKey: "AIzaSyCQ_MSZ1sIli8PRda5bQVYMKwgmHJLtKwA",
         authDomain: "gestao-leitos.firebaseapp.com",
@@ -1104,630 +888,433 @@
         storageBucket: "gestao-leitos.firebasestorage.app",
         messagingSenderId: "594249273990",
         appId: "1:594249273990:web:6c601f868ad9b0a4157707",
-        measurementId: "G-N72V6C9EDH",
       };
 
-      // Função de inicialização
-      async function initializeFirebase() {
+      const appId = "gestao-leitos-web";
+      let db, auth, userId;
+      let units = [];
+      let chartInstances = {};
+
+      // DOM Elements
+      const sidebar = document.getElementById("sidebar");
+      const modal = document.getElementById("add-unit-modal");
+      const form = document.getElementById("add-unit-form");
+      const bedInputs = document.getElementById("bed-inventory-inputs");
+      const unitNameInput = document.getElementById("unit-name");
+      const nameFeedback = document.createElement("small");
+      nameFeedback.style.display = "block";
+      nameFeedback.style.marginTop = "4px";
+      nameFeedback.style.fontWeight = "600";
+      unitNameInput.parentNode.appendChild(nameFeedback);
+
+      // INIT
+      async function init() {
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+
         try {
-          if (Object.keys(firebaseConfig).length === 0) {
-            console.error("Firebase config is empty. Cannot initialize.");
-            userId = crypto.randomUUID();
-            userIdDisplay.textContent = `Usuário (Não Autenticado): ${userId.substring(
-              0,
-              8
-            )}...`;
-            renderData();
-            loadingState.style.display = "none";
-            return;
-          }
+          await enableIndexedDbPersistence(db);
+        } catch (e) {}
 
-          app = initializeApp(firebaseConfig);
-          db = getFirestore(app);
+        onAuthStateChanged(auth, async (user) => {
+          if (!user) await signInAnonymously(auth);
+          userId = auth.currentUser.uid;
+          document.getElementById("user-id-display").textContent =
+            "ID: " + userId.substring(0, 8);
+          loadData();
+        });
+      }
 
-          // --- NOVO CÓDIGO: ATIVAR MODO OFFLINE ---
-          try {
-            await enableIndexedDbPersistence(db);
-            console.log("Persistência offline ativada!");
-          } catch (err) {
-            if (err.code == "failed-precondition") {
-              console.warn(
-                "Múltiplas abas abertas. A persistência só funciona em uma."
+      function loadData() {
+        const col = collection(
+          db,
+          `artifacts/${appId}/public/data/hospital_inventory`
+        );
+        onSnapshot(col, (snap) => {
+          units = [];
+          snap.forEach((d) => units.push({ id: d.id, ...d.data() }));
+          render();
+          document.getElementById("loading-state").style.display = "none";
+        });
+      }
+
+      // RENDER
+      let filter = "all";
+      let search = "";
+
+      function render() {
+        const filtered = units
+          .filter((u) => {
+            const matchFilter = filter === "all" || u.category === filter;
+            const matchSearch =
+              u.name.toLowerCase().includes(search.toLowerCase()) ||
+              u.inventory.some((i) =>
+                i.type.toLowerCase().includes(search.toLowerCase())
               );
-            } else if (err.code == "unimplemented") {
-              console.warn("Navegador não suporta persistência offline.");
-            }
-          }
-          // ----------------------------------------
+            return matchFilter && matchSearch;
+          })
+          .sort((a, b) => b.totalBeds - a.totalBeds);
 
-          auth = getAuth(app);
-
-          // 1. Autenticação (Custom Token ou Anônima)
-          await new Promise((resolve) => {
-            const unsubscribe = onAuthStateChanged(auth, async (user) => {
-              unsubscribe();
-
-              if (user) {
-                userId = user.uid;
-              } else {
-                const customToken =
-                  typeof __initial_auth_token !== "undefined"
-                    ? __initial_auth_token
-                    : null;
-                if (customToken) {
-                  await signInWithCustomToken(auth, customToken);
-                  userId = auth.currentUser.uid;
-                } else {
-                  await signInAnonymously(auth);
-                  userId = auth.currentUser.uid;
-                }
-              }
-
-              userIdDisplay.textContent = `ID do Usuário: ${userId}`;
-              resolve();
-            });
-          });
-
-          // 2. Iniciar a Observação do Firestore
-          setupFirestoreListener();
-        } catch (error) {
-          console.error(
-            "Erro durante a inicialização ou autenticação do Firebase:",
-            error
-          );
-          loadingState.innerHTML =
-            '<p style="color:red;">Erro ao conectar com o banco de dados. Verifique a configuração.</p>';
-          userId = crypto.randomUUID();
-          userIdDisplay.textContent = `Usuário (Erro): ${userId.substring(
-            0,
-            8
-          )}...`;
-          renderData();
-        }
-      }
-
-      // Listener do Firestore para Tempo Real
-      function setupFirestoreListener() {
-        if (!db || !userId) return;
-
-        const publicCollectionPath = `artifacts/${appId}/public/data/hospital_inventory`;
-        const unitsCollection = collection(db, publicCollectionPath);
-
-        onSnapshot(
-          unitsCollection,
-          (snapshot) => {
-            const fetchedUnits = [];
-            snapshot.forEach((doc) => {
-              fetchedUnits.push({ id: doc.id, ...doc.data() });
-            });
-            units = fetchedUnits;
-
-            loadingState.style.display = "none";
-
-            renderData();
-            updateKpis(units);
-            updateCharts(units);
-          },
-          (error) => {
-            console.error("Erro ao receber dados do Firestore:", error);
-            loadingState.innerHTML =
-              '<p style="color:red;">Erro de acesso ao banco de dados. Verifique as regras de segurança.</p>';
-          }
-        );
-      }
-
-      // =========================================================================
-      // FUNÇÕES DE MANIPULAÇÃO DE DADOS E RENDERIZAÇÃO
-      // =========================================================================
-
-      // ----------------- Funções de Renderização -----------------
-
-      function renderData() {
-        const filteredUnits = applyFiltersAndSearch(
-          units,
-          currentFilter,
-          currentSearch
-        );
-
-        gridContainer.innerHTML = "";
-        tableBody.innerHTML = "";
-
-        if (filteredUnits.length === 0) {
+        // Empty State
+        if (filtered.length === 0) {
           document.getElementById("empty-state").style.display = "block";
-          gridView.style.display = "none";
-          tableView.style.display = "none";
-          return;
+          document.getElementById("grid-view").style.display = "none";
         } else {
           document.getElementById("empty-state").style.display = "none";
+          if (document.getElementById("table-view").style.display === "none") {
+            document.getElementById("grid-view").style.display = "grid";
+          }
         }
 
-        // Renderizar Grid View
-        filteredUnits.forEach((unit) => {
-          gridContainer.appendChild(createUnitCard(unit));
-        });
+        // Update KPIs
+        let t = 0,
+          u = 0,
+          o = 0,
+          c = 0;
+        units.forEach((unit) =>
+          unit.inventory.forEach((i) => {
+            let q = +i.quantity || 0;
+            t += q;
+            let type = i.type.toLowerCase();
+            if (type.includes("uti")) u += q;
+            else if (type.includes("obs") || type.includes("parto")) o += q;
+            else c += q;
+          })
+        );
+        document.getElementById("kpi-total").textContent = t;
+        document.getElementById("kpi-uti").textContent = u;
+        document.getElementById("kpi-obs").textContent = o;
+        document.getElementById("kpi-clin").textContent = c;
 
-        // Renderizar Table View
-        filteredUnits.forEach((unit) => {
-          tableBody.appendChild(createUnitTableRow(unit));
-        });
+        // Charts
+        updateCharts(filtered.slice(0, 8));
 
-        const isGridViewActive = btnGrid.classList.contains("active");
-        gridView.style.display = isGridViewActive ? "grid" : "none";
-        tableView.style.display = isGridViewActive ? "none" : "block";
-      }
+        // Grid
+        const grid = document.getElementById("grid-view");
+        grid.innerHTML = "";
+        filtered.forEach((unit) => {
+          const card = document.createElement("div");
+          card.className = "unit-card";
+          const total = unit.inventory.reduce(
+            (a, b) => a + (+b.quantity || 0),
+            0
+          );
 
-      function applyFiltersAndSearch(data, filter, search) {
-        let filtered = data;
-        const searchLower = search.toLowerCase();
-
-        if (filter !== "all") {
-          filtered = filtered.filter((unit) => unit.category === filter);
-        }
-
-        if (searchLower) {
-          filtered = filtered.filter((unit) => {
-            const matchesName = unit.name.toLowerCase().includes(searchLower);
-            const matchesCategory = unit.category
-              .toLowerCase()
-              .includes(searchLower);
-            const matchesBedType = unit.inventory.some((item) =>
-              item.type.toLowerCase().includes(searchLower)
-            );
-            return matchesName || matchesCategory || matchesBedType;
-          });
-        }
-
-        return filtered.sort((a, b) => b.totalBeds - a.totalBeds);
-      }
-
-      function calculateTotalBeds(inventory) {
-        return inventory.reduce((sum, item) => sum + (item.quantity || 0), 0);
-      }
-
-      function createUnitCard(unit) {
-        const card = document.createElement("div");
-        card.className = "unit-card";
-
-        const totalBeds = calculateTotalBeds(unit.inventory);
-
-        let lastUpdate = "N/A";
-        if (unit.lastUpdated && unit.lastUpdated.toDate) {
-          lastUpdate = unit.lastUpdated.toDate().toLocaleString("pt-BR");
-        } else if (unit.lastUpdated) {
-          lastUpdate = new Date(unit.lastUpdated).toLocaleString("pt-BR");
-        }
-
-        card.innerHTML = `
-                <div class="card-top">
-                    <div class="unit-title">
+          card.innerHTML = `
+                <div class="card-header-row">
+                    <div class="unit-info">
                         <h3>${unit.name}</h3>
-                        <span class="unit-cat-badge">${unit.category}</span>
+                        <span class="unit-cat">${unit.category}</span>
                     </div>
-                    <div class="total-badge">
-                        ${totalBeds}<span style="font-size:10px;">Leitos</span>
-                    </div>
+                    <div class="total-badge">${total}<span>Leitos</span></div>
                 </div>
                 <div class="types-list">
                     ${unit.inventory
-                      .map((item) => {
-                        const typeLower = item.type.toLowerCase();
-                        let className = "tag-cli";
-                        if (typeLower.includes("uti")) {
-                          className = "tag-uti";
-                        }
-
-                        return `<span class="type-tag ${className}">${item.type}: <b>${item.quantity}</b></span>`;
-                      })
+                      .map(
+                        (i) =>
+                          `<span class="type-tag ${
+                            i.type.toLowerCase().includes("uti")
+                              ? "tag-uti"
+                              : "tag-cli"
+                          }">${i.type}: <b>${i.quantity}</b></span>`
+                      )
                       .join("")}
                 </div>
-                <div class="card-divider"></div>
-                <p class="kpi-sub" style="font-size:11px; margin-top: auto;">Última Atualização: ${lastUpdate}</p>
-                <p class="kpi-sub" style="font-size:11px;">Cadastrado por: ${unit.userId.substring(
-                  0,
-                  8
-                )}...</p>
+                <div style="margin-top:auto; padding-top:15px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+                   <span style="font-size:10px; color:#94a3b8;">Ref: ${unit.id.substring(
+                     0,
+                     8
+                   )}</span>
+                   <div class="card-actions">
+                      <button class="btn-icon-card btn-edit" title="Editar / Excluir Leitos">✏️</button>
+                      <button class="btn-icon-card btn-del" title="Excluir Unidade">🗑️</button>
+                   </div>
+                </div>
             `;
 
-        return card;
-      }
+          // Eventos
+          card.querySelector(".btn-edit").onclick = () => openEditModal(unit);
+          card.querySelector(".btn-del").onclick = () =>
+            confirmDelete(unit.id, unit.name);
 
-      function createUnitTableRow(unit) {
-        const row = document.createElement("tr");
-        const totalBeds = calculateTotalBeds(unit.inventory);
-
-        let lastUpdate = "N/A";
-        if (unit.lastUpdated && unit.lastUpdated.toDate) {
-          lastUpdate = unit.lastUpdated.toDate().toLocaleString("pt-BR");
-        } else if (unit.lastUpdated) {
-          lastUpdate = new Date(unit.lastUpdated).toLocaleString("pt-BR");
-        }
-
-        row.innerHTML = `
-                <td>
-                    ${unit.name}
-                    <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Atualizado: ${lastUpdate}</div>
-                </td>
-                <td><span class="unit-cat-badge">${unit.category}</span></td>
-                <td><div class="total-badge">${totalBeds}</div></td>
-                <td>
-                    <div class="types-cell">
-                        ${unit.inventory
-                          .map((item) => {
-                            const typeLower = item.type.toLowerCase();
-                            let className = "tag-cli";
-                            if (typeLower.includes("uti")) {
-                              className = "tag-uti";
-                            }
-                            return `<span class="type-tag ${className}">${item.type}: <b>${item.quantity}</b></span>`;
-                          })
-                          .join("")}
-                    </div>
-                </td>
-            `;
-        return row;
-      }
-
-      // ----------------- Funções de KPI e Gráficos -----------------
-      function updateKpis(data) {
-        let total = 0;
-        let totalUti = 0;
-        let totalClin = 0;
-        let totalObs = 0;
-
-        data.forEach((unit) => {
-          unit.inventory.forEach((item) => {
-            const type = item.type.toLowerCase();
-            const qty = item.quantity || 0;
-            total += qty;
-
-            if (
-              type.includes("uti") ||
-              type.includes("unidade de terapia intensiva")
-            ) {
-              totalUti += qty;
-            } else if (
-              type.includes("obstétrico") ||
-              type.includes("parto") ||
-              type.includes("ucinca") ||
-              type.includes("ugar") ||
-              type.includes("alcon")
-            ) {
-              totalObs += qty;
-            } else if (
-              type.includes("clínico") ||
-              type.includes("geral") ||
-              type.includes("enfermaria")
-            ) {
-              totalClin += qty;
-            }
-          });
+          grid.appendChild(card);
         });
 
-        document.getElementById("kpi-total").textContent =
-          total.toLocaleString("pt-BR");
-        document.getElementById("kpi-uti").textContent =
-          totalUti.toLocaleString("pt-BR");
-        document.getElementById("kpi-obs").textContent =
-          totalObs.toLocaleString("pt-BR");
-        document.getElementById("kpi-clin").textContent =
-          totalClin.toLocaleString("pt-BR");
+        // Table
+        const tbody = document.getElementById("table-body");
+        tbody.innerHTML = filtered
+          .map(
+            (u) => `
+            <tr>
+                <td>${u.name}</td>
+                <td>${u.category}</td>
+                <td><b>${u.totalBeds}</b></td>
+                <td>${u.inventory
+                  .map((i) => `${i.type}: ${i.quantity}`)
+                  .join(", ")}</td>
+            </tr>
+        `
+          )
+          .join("");
       }
 
       function updateCharts(data) {
         if (chartInstances.bar) chartInstances.bar.destroy();
         if (chartInstances.doughnut) chartInstances.doughnut.destroy();
 
-        // 1. Dados para o Gráfico de Barras
-        const topUnits = data.slice(0, 8); // Top 8
-        const barLabels = topUnits.map((unit) => unit.name);
-        const barData = topUnits.map((unit) =>
-          calculateTotalBeds(unit.inventory)
-        );
-        const barCtx = document.getElementById("barChart").getContext("2d");
-
-        chartInstances.bar = new Chart(barCtx, {
+        chartInstances.bar = new Chart(document.getElementById("barChart"), {
           type: "bar",
           data: {
-            labels: barLabels,
+            labels: data.map((u) => u.name),
             datasets: [
               {
-                label: "Total de Leitos",
-                data: barData,
+                data: data.map((u) => u.totalBeds),
                 backgroundColor: "#4C9A2A",
-                borderRadius: 6,
+                borderRadius: 4,
               },
             ],
           },
           options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-                title: { display: true, text: "Nº de Leitos" },
-              },
-              x: { display: false },
-            },
             plugins: { legend: { display: false } },
-          },
-        });
-
-        // 2. Dados para o Gráfico de Rosca
-        const typeCounts = data.reduce((acc, unit) => {
-          unit.inventory.forEach((item) => {
-            const type = item.type.trim();
-            acc[type] = (acc[type] || 0) + (item.quantity || 0);
-          });
-          return acc;
-        }, {});
-
-        const doughnutLabels = Object.keys(typeCounts);
-        const doughnutData = Object.values(typeCounts);
-        const backgroundColors = [
-          "#dc2626",
-          "#4C9A2A",
-          "#004D99",
-          "#f59e0b",
-          "#a855f7",
-          "#06b6d4",
-          "#f97316",
-          "#6366f1",
-        ];
-
-        const doughnutCtx = document
-          .getElementById("doughnutChart")
-          .getContext("2d");
-        chartInstances.doughnut = new Chart(doughnutCtx, {
-          type: "doughnut",
-          data: {
-            labels: doughnutLabels,
-            datasets: [
-              {
-                data: doughnutData,
-                backgroundColor: doughnutLabels.map(
-                  (_, i) => backgroundColors[i % backgroundColors.length]
-                ),
-                hoverOffset: 4,
-              },
-            ],
-          },
-          options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-              legend: { position: "right" },
-            },
           },
         });
-      }
 
-      // =========================================================================
-      // FUNÇÕES E EVENT HANDLERS DO FORMULÁRIO (MODAL)
-      // =========================================================================
-
-      function openModal() {
-        modal.classList.add("active");
-        document.body.style.overflow = "hidden";
-        nameFeedback.textContent = ""; // Limpa aviso ao abrir
-      }
-
-      function closeModal() {
-        modal.classList.remove("active");
-        document.body.style.overflow = "";
-        addUnitForm.reset();
-        bedInventoryInputs.innerHTML = "";
-        addBedInput(0);
-        nameFeedback.textContent = "";
-      }
-
-      function addBedInput(index, type = "", quantity = "") {
-        const newIndex = bedInventoryInputs.children.length;
-        const row = document.createElement("div");
-        row.className = "bed-input-row";
-        row.setAttribute("data-index", newIndex);
-
-        row.innerHTML = `
-                <input type="text" class="form-input bed-type" placeholder="Tipo (Ex: UTI Adulto)" value="${type}" required>
-                <input type="number" class="form-input bed-qtd" placeholder="Qtd" value="${quantity}" min="1" required>
-                ${
-                  newIndex > 0
-                    ? '<button type="button" class="remove-bed-btn">&times;</button>'
-                    : ""
-                }
-            `;
-
-        bedInventoryInputs.appendChild(row);
-
-        const removeBtn = row.querySelector(".remove-bed-btn");
-        if (removeBtn) {
-          removeBtn.addEventListener("click", () => {
-            row.remove();
-          });
-        }
-      }
-
-      addBedInputBtn.addEventListener("click", () => {
-        addBedInput(bedInventoryInputs.children.length);
-      });
-
-      addUnitBtn.addEventListener("click", openModal);
-
-      modalCloseBtn.addEventListener("click", closeModal);
-      btnCancelForm.addEventListener("click", closeModal);
-      modal.addEventListener("click", (e) => {
-        if (e.target === modal) {
-          closeModal();
-        }
-      });
-
-      // Evento de Submissão do Formulário (COM MERGE DE DADOS)
-      addUnitForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        // 1. Coletar dados básicos
-        const unitName = unitNameInput.value.trim();
-        const unitCategory = unitCategorySelect.value;
-        const unitId = unitName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-
-        // 2. Coletar o Inventário do Formulário
-        const newInventory = [];
-        const bedRows = bedInventoryInputs.querySelectorAll(".bed-input-row");
-        let formValid = true;
-
-        bedRows.forEach((row) => {
-          const typeInput = row.querySelector(".bed-type");
-          const qtdInput = row.querySelector(".bed-qtd");
-          const type = typeInput.value.trim();
-          const quantity = parseInt(qtdInput.value, 10);
-
-          if (type && quantity > 0) {
-            newInventory.push({ type, quantity });
-          } else if ((!type && quantity > 0) || (type && quantity <= 0)) {
-            formValid = false;
+        const types = {};
+        data.forEach((u) =>
+          u.inventory.forEach(
+            (i) => (types[i.type] = (types[i.type] || 0) + i.quantity)
+          )
+        );
+        chartInstances.doughnut = new Chart(
+          document.getElementById("doughnutChart"),
+          {
+            type: "doughnut",
+            data: {
+              labels: Object.keys(types),
+              datasets: [
+                {
+                  data: Object.values(types),
+                  backgroundColor: [
+                    "#dc2626",
+                    "#4C9A2A",
+                    "#004D99",
+                    "#f59e0b",
+                    "#a855f7",
+                  ],
+                },
+              ],
+            },
+            options: {
+              plugins: { legend: { position: "right" } },
+              responsive: true,
+              maintainAspectRatio: false,
+            },
           }
+        );
+      }
+
+      // --- EDIT & DELETE LOGIC ---
+
+      window.confirmDelete = async (id, name) => {
+        if (
+          confirm(
+            `Tem certeza que deseja EXCLUIR a unidade "${name}"?\nIsso não pode ser desfeito.`
+          )
+        ) {
+          try {
+            await deleteDoc(
+              doc(db, `artifacts/${appId}/public/data/hospital_inventory`, id)
+            );
+            // alert('Unidade excluída!');
+          } catch (e) {
+            alert("Erro ao excluir: " + e.message);
+          }
+        }
+      };
+
+      window.openEditModal = (unit) => {
+        document.getElementById("modal-title").textContent =
+          "Editar / Excluir Leitos";
+        document.getElementById("unit-id-hidden").value = unit.id;
+        document.getElementById("unit-name").value = unit.name;
+        document.getElementById("unit-category").value = unit.category;
+
+        bedInputs.innerHTML = "";
+        unit.inventory.forEach((item, idx) =>
+          addBedRow(item.type, item.quantity)
+        );
+        if (unit.inventory.length === 0) addBedRow();
+
+        nameFeedback.textContent = "";
+        modal.classList.add("active");
+      };
+
+      // --- FORM & SAVING ---
+
+      function addBedRow(type = "", qtd = "") {
+        const div = document.createElement("div");
+        div.className = "bed-input-row";
+        div.innerHTML = `
+             <input type="text" class="form-input bed-type" placeholder="Tipo (Ex: UTI)" value="${type}" required>
+             <input type="number" class="form-input bed-qtd" placeholder="Qtd" value="${qtd}" required>
+             <button type="button" class="remove-bed-btn" title="Excluir este leito">&times;</button>
+          `;
+        div.querySelector(".remove-bed-btn").onclick = () => div.remove();
+        bedInputs.appendChild(div);
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector(".btn-save");
+        const oldText = btn.textContent;
+        btn.textContent = "Salvando...";
+        btn.disabled = true;
+
+        const name = document.getElementById("unit-name").value.trim();
+        const cat = document.getElementById("unit-category").value;
+
+        // Se tiver ID oculto (edição via lápis), usa ele. Se não, gera pelo nome.
+        let id = document.getElementById("unit-id-hidden").value;
+        if (!id) id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+        const newInv = [];
+        document.querySelectorAll(".bed-input-row").forEach((row) => {
+          const t = row.querySelector(".bed-type").value.trim();
+          const q = parseInt(row.querySelector(".bed-qtd").value);
+          if (t && q > 0) newInv.push({ type: t, quantity: q });
         });
 
-        if (!formValid || newInventory.length === 0) {
-          alert("Por favor, preencha corretamente os tipos de leito.");
+        // PARA ATENDER AO PEDIDO "EXCLUIR TIPO DE LEITO":
+        // Salvamos exatamente o que está no formulário. Se o usuário removeu a linha, ela some do banco.
+        const total = newInv.reduce((a, b) => a + b.quantity, 0);
+
+        try {
+          await setDoc(
+            doc(db, `artifacts/${appId}/public/data/hospital_inventory`, id),
+            {
+              name: name,
+              category: cat,
+              inventory: newInv,
+              totalBeds: total,
+              lastUpdated: serverTimestamp(),
+              userId: userId,
+            }
+          );
+          modal.classList.remove("active");
+        } catch (err) {
+          alert("Erro ao salvar: " + err.message);
+        } finally {
+          btn.textContent = oldText;
+          btn.disabled = false;
+        }
+      });
+
+      // AUTO-PREENCHIMENTO PARA NOVAS UNIDADES
+      unitNameInput.addEventListener("input", () => {
+        // Só roda se não estivermos editando (id oculto vazio)
+        if (document.getElementById("unit-id-hidden").value) return;
+
+        const typed = unitNameInput.value.trim();
+        const sid = typed.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        if (!sid) {
+          nameFeedback.textContent = "";
           return;
         }
 
-        try {
-          // 3. Verificar se a unidade já existe para fazer o MERGE (Mesclagem)
-          const docRef = doc(
-            db,
-            `artifacts/${appId}/public/data/hospital_inventory`,
-            unitId
-          );
-          const docSnap = await getDoc(docRef);
+        const found = units.find((u) => u.id === sid);
+        if (found) {
+          nameFeedback.textContent = "✅ Unidade existente! Dados carregados.";
+          nameFeedback.style.color = "#4C9A2A";
+          document.getElementById("unit-category").value = found.category;
+          bedInputs.innerHTML = "";
+          found.inventory.forEach((i) => addBedRow(i.type, i.quantity));
+        } else {
+          nameFeedback.textContent = "✨ Nova Unidade";
+          nameFeedback.style.color = "#64748b";
+        }
+      });
 
-          let finalInventory = [...newInventory]; // Começa com os novos
-
-          if (docSnap.exists()) {
-            const existingData = docSnap.data();
-            const oldInventory = existingData.inventory || [];
-
-            // Lógica de Mesclagem:
-            // Se o tipo NÃO estiver no novo (formulário), mantemos o antigo.
-            oldInventory.forEach((oldItem) => {
-              const existsInNew = newInventory.some(
-                (newItem) =>
-                  newItem.type.toLowerCase() === oldItem.type.toLowerCase()
-              );
-
-              if (!existsInNew) {
-                finalInventory.push(oldItem);
-              }
+      // --- EXPORT TO CSV ---
+      document.getElementById("btn-export").onclick = () => {
+        let csv = "Unidade;Categoria;Tipo de Leito;Quantidade\n";
+        units.forEach((u) => {
+          if (u.inventory.length === 0) {
+            csv += `${u.name};${u.category};Sem leitos;0\n`;
+          } else {
+            u.inventory.forEach((i) => {
+              csv += `${u.name};${u.category};${i.type};${i.quantity}\n`;
             });
           }
-
-          // 4. Calcular o novo total
-          const totalBeds = finalInventory.reduce(
-            (sum, item) => sum + (item.quantity || 0),
-            0
-          );
-
-          // 5. Montar o objeto final
-          const unitData = {
-            name: unitName,
-            category: unitCategory,
-            inventory: finalInventory,
-            totalBeds: totalBeds,
-            lastUpdated: serverTimestamp(),
-            userId: userId,
-          };
-
-          // 6. Salvar no Firestore
-          await setDoc(docRef, unitData);
-
-          closeModal();
-          console.log("Unidade atualizada com sucesso (Merge realizado).");
-        } catch (error) {
-          console.error("Erro ao salvar dados no Firestore:", error);
-          alert("Erro ao salvar no banco de dados: " + error.message);
-        }
-      });
-
-      // =========================================================================
-      // EVENT LISTENERS GERAIS (Filtros e Pesquisa)
-      // =========================================================================
-
-      navItems.forEach((item) => {
-        item.addEventListener("click", () => {
-          navItems.forEach((nav) => nav.classList.remove("active"));
-          item.classList.add("active");
-          currentFilter = item.getAttribute("data-filter");
-          renderData();
         });
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "relatorio_leitos.csv";
+        a.click();
+      };
+
+      // --- UI EVENTS ---
+      document.getElementById("menu-toggle").onclick = () =>
+        sidebar.classList.add("active");
+      document.getElementById("close-sidebar").onclick = () =>
+        sidebar.classList.remove("active");
+      document.getElementById("modal-close-btn").onclick = () =>
+        modal.classList.remove("active");
+      document.getElementById("add-bed-input").onclick = () => addBedRow();
+
+      document.getElementById("add-unit-btn").onclick = () => {
+        // Reset para nova unidade
+        document.getElementById("unit-id-hidden").value = "";
+        document.getElementById("modal-title").textContent =
+          "Adicionar Unidade";
+        form.reset();
+        bedInputs.innerHTML = "";
+        addBedRow();
+        nameFeedback.textContent = "";
+        sidebar.classList.remove("active"); // Fecha menu no mobile
+        modal.classList.add("active");
+      };
+
+      // Search & Filters
+      document.getElementById("search-input").oninput = (e) => {
+        search = e.target.value;
+        render();
+      };
+
+      document.querySelectorAll(".nav-item").forEach((el) => {
+        el.onclick = () => {
+          document
+            .querySelectorAll(".nav-item")
+            .forEach((n) => n.classList.remove("active"));
+          el.classList.add("active");
+          filter = el.dataset.filter;
+          // UX: Fecha menu ao clicar no filtro (mobile)
+          sidebar.classList.remove("active");
+          render();
+        };
       });
 
-      searchInput.addEventListener("input", () => {
-        currentSearch = searchInput.value;
-        renderData();
-      });
-
-      btnGrid.addEventListener("click", () => {
-        btnTable.classList.remove("active");
-        btnGrid.classList.add("active");
-        renderData();
-      });
-
-      btnTable.addEventListener("click", () => {
-        btnGrid.classList.remove("active");
-        btnTable.classList.add("active");
-        renderData();
-      });
-
-      const menuToggle = document.getElementById("menu-toggle");
-      const sidebar = document.getElementById("sidebar");
-      const mainWrapper = document.getElementById("main-wrapper");
-
-      menuToggle.addEventListener("click", () => {
-        sidebar.classList.toggle("open");
-        mainWrapper.classList.toggle("blurred");
-      });
-
-      mainWrapper.addEventListener("click", (e) => {
-        if (
-          sidebar.classList.contains("open") &&
-          !sidebar.contains(e.target) &&
-          e.target !== menuToggle
-        ) {
-          sidebar.classList.remove("open");
-          mainWrapper.classList.remove("blurred");
+      // View Toggle
+      const btnTable = document.getElementById("btn-table-toggle");
+      btnTable.onclick = () => {
+        const grid = document.getElementById("grid-view");
+        const table = document.getElementById("table-view");
+        if (grid.style.display === "none") {
+          grid.style.display = "grid";
+          table.style.display = "none";
+          btnTable.textContent = "Ver Lista";
+        } else {
+          grid.style.display = "none";
+          table.style.display = "block";
+          btnTable.textContent = "Ver Cards";
         }
-      });
+      };
 
-      // =========================================================================
-      // REGISTRO DO SERVICE WORKER (PWA)
-      // =========================================================================
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("./service-worker.js")
-            .then((reg) => {
-              console.log(
-                "Service Worker registrado com sucesso. Escopo:",
-                reg.scope
-              );
-            })
-            .catch((err) => {
-              console.error("Falha no registro do Service Worker:", err);
-            });
-        });
-      }
-
-      // =========================================================================
-      // INICIALIZAÇÃO
-      // =========================================================================
-
-      document.addEventListener("DOMContentLoaded", () => {
-        if (bedInventoryInputs.children.length === 0) {
-          addBedInput(0);
-        }
-      });
-
-      window.onload = initializeFirebase;
+      init();
     </script>
   </body>
 </html>
