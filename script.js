@@ -312,11 +312,11 @@
                         <input type="text" class="form-input sub-bed-name" placeholder="Nome do sub-leito (ex: Enfermaria, UCI)" value="${nome}">
                         <div class="number-field">
                             <label class="number-label">Cadastrados</label>
-                            <input type="number" class="form-input" placeholder="0" value="${cad}" min="0">
+                            <input type="number" class="form-input" placeholder="0" value="${cad}" min="0" onfocus="this.select()">
                         </div>
                         <div class="number-field">
                             <label class="number-label">Não Cad.</label>
-                            <input type="number" class="form-input" placeholder="0" value="${naoCad}" min="0">
+                            <input type="number" class="form-input" placeholder="0" value="${naoCad}" min="0" onfocus="this.select()">
                         </div>
                         <button type="button" class="remove-bed-btn" title="Remover">&times;</button>
                       `;
@@ -538,11 +538,11 @@
                 <input type="text" class="form-input sub-bed-name" placeholder="Nome do sub-leito (ex: Enfermaria, UCI)">
                 <div class="number-field">
                     <label class="number-label">Cadastrados</label>
-                    <input type="number" class="form-input" placeholder="0" value="0" min="0">
+                    <input type="number" class="form-input" placeholder="0" value="0" min="0" onfocus="this.select()">
                 </div>
                 <div class="number-field">
                     <label class="number-label">Não Cad.</label>
-                    <input type="number" class="form-input" placeholder="0" value="0" min="0">
+                    <input type="number" class="form-input" placeholder="0" value="0" min="0" onfocus="this.select()">
                 </div>
                 <button type="button" class="remove-bed-btn" title="Remover">&times;</button>
               `;
