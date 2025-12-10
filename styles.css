@@ -423,29 +423,13 @@
         .sub-bed-container {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-        }
-
-        .sub-bed-row {
-            display: grid;
-            grid-template-columns: 1fr 70px 70px 36px;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .sub-bed-row input[type="text"] {
-            min-width: 0;
-        }
-
-        .sub-bed-row input[type="number"] {
-            text-align: center;
-            padding: 10px 6px;
+            gap: 12px;
         }
 
         .add-sub-bed-btn {
             margin-top: 12px;
-            padding: 10px 14px;
-            font-size: 13px;
+            padding: 14px;
+            font-size: 14px;
             background: transparent;
             border: 1px dashed var(--accent-primary);
             color: var(--accent-primary);
@@ -463,11 +447,10 @@
 
         .inventory-section-header {
             display: grid;
-            grid-template-columns: 1fr 70px 70px 36px;
+            grid-template-columns: 1fr 80px 80px 36px;
             gap: 8px;
-            padding: 0 0 8px 0;
-            margin-bottom: 8px;
-            border-bottom: 1px solid var(--border-light);
+            padding: 0 12px 8px 12px;
+            margin-bottom: 0;
         }
 
         .inventory-section-header span {
@@ -481,6 +464,142 @@
         .inventory-section-header span:nth-child(2),
         .inventory-section-header span:nth-child(3) {
             text-align: center;
+        }
+
+        /* Number field wrapper */
+        .number-field {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .number-label {
+            display: none;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .sub-bed-row {
+            display: grid;
+            grid-template-columns: 1fr 80px 80px 36px;
+            gap: 8px;
+            align-items: center;
+            background: var(--border-light);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .sub-bed-row .sub-bed-name {
+            min-width: 0;
+            font-size: 14px;
+            padding: 12px;
+            background: white;
+            border: 1px solid var(--border-color);
+        }
+
+        .number-field input[type="number"] {
+            width: 100%;
+            text-align: center;
+            padding: 12px 6px;
+            font-size: 16px;
+            font-weight: 600;
+            background: white;
+            border: 1px solid var(--border-color);
+        }
+
+        /* MOBILE: Layout vertical para sub-leitos */
+        @media (max-width: 480px) {
+            .inventory-section-header {
+                display: none;
+            }
+
+            .sub-bed-row {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding: 16px;
+                padding-right: 48px;
+                position: relative;
+            }
+
+            .sub-bed-row .sub-bed-name {
+                width: 100%;
+                font-size: 16px;
+                padding: 14px;
+                border-radius: var(--radius-sm);
+            }
+
+            .sub-bed-row .sub-bed-name::placeholder {
+                color: var(--text-muted);
+                font-size: 14px;
+            }
+
+            /* Container para os dois campos numéricos lado a lado */
+            .sub-bed-row .number-field {
+                display: flex;
+                flex-direction: column;
+                width: calc(50% - 4px);
+                float: left;
+            }
+
+            .sub-bed-row .number-field:first-of-type {
+                margin-right: 8px;
+            }
+
+            /* Labels visíveis no mobile */
+            .number-label {
+                display: block !important;
+                font-size: 11px;
+                font-weight: 600;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                margin-bottom: 6px;
+                letter-spacing: 0.3px;
+            }
+
+            .number-field input[type="number"] {
+                width: 100%;
+                padding: 14px;
+                font-size: 18px;
+                border-radius: var(--radius-sm);
+            }
+
+            .sub-bed-row .remove-bed-btn {
+                position: absolute;
+                top: 12px;
+                right: 12px;
+                width: 36px;
+                height: 36px;
+            }
+
+            /* Wrapper para campos numéricos */
+            .sub-bed-row::after {
+                content: '';
+                display: block;
+                clear: both;
+            }
+
+            .bed-type-group {
+                padding: 12px;
+            }
+
+            .bed-type-header {
+                font-size: 12px;
+                padding: 10px 12px;
+            }
+
+            .modal-body {
+                padding: 16px;
+            }
+
+            .add-sub-bed-btn {
+                padding: 16px;
+                font-size: 15px;
+            }
         }
 
 

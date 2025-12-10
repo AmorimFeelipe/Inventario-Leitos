@@ -309,9 +309,15 @@
                     const subRow = document.createElement('div');
                     subRow.className = 'sub-bed-row';
                     subRow.innerHTML = `
-                        <input type="text" class="form-input" placeholder="Nome" value="${nome}" required>
-                        <input type="number" class="form-input" placeholder="0" value="${cad}" required min="0">
-                        <input type="number" class="form-input" placeholder="0" value="${naoCad}" required min="0">
+                        <input type="text" class="form-input sub-bed-name" placeholder="Nome do sub-leito (ex: Enfermaria, UCI)" value="${nome}">
+                        <div class="number-field">
+                            <label class="number-label">Cadastrados</label>
+                            <input type="number" class="form-input" placeholder="0" value="${cad}" min="0">
+                        </div>
+                        <div class="number-field">
+                            <label class="number-label">Não Cad.</label>
+                            <input type="number" class="form-input" placeholder="0" value="${naoCad}" min="0">
+                        </div>
                         <button type="button" class="remove-bed-btn" title="Remover">&times;</button>
                       `;
                     subRow.querySelector('.remove-bed-btn').onclick = () => subRow.remove();
@@ -529,9 +535,15 @@
                 const subRow = document.createElement('div');
                 subRow.className = 'sub-bed-row';
                 subRow.innerHTML = `
-                <input type="text" class="form-input" placeholder="Nome" required>
-                <input type="number" class="form-input" placeholder="0" value="0" required min="0">
-                <input type="number" class="form-input" placeholder="0" value="0" required min="0">
+                <input type="text" class="form-input sub-bed-name" placeholder="Nome do sub-leito (ex: Enfermaria, UCI)">
+                <div class="number-field">
+                    <label class="number-label">Cadastrados</label>
+                    <input type="number" class="form-input" placeholder="0" value="0" min="0">
+                </div>
+                <div class="number-field">
+                    <label class="number-label">Não Cad.</label>
+                    <input type="number" class="form-input" placeholder="0" value="0" min="0">
+                </div>
                 <button type="button" class="remove-bed-btn" title="Remover">&times;</button>
               `;
                 subRow.querySelector('.remove-bed-btn').onclick = () => subRow.remove();
@@ -541,8 +553,7 @@
 
             addSubBtn.onclick = addSubBed;
 
-            // Adicionar um sub-leito inicial
-            addSubBed();
+            // NÃO adicionar sub-leito inicial - permitir tipos vazios
 
             bedInputs.appendChild(groupDiv);
         }
