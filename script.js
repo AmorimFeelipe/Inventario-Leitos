@@ -291,32 +291,15 @@
 
                 groupDiv.innerHTML = `
                     <div class="bed-type-header">${tipoPrincipal}</div>
-                    <!-- CABEÇALHO COM ÍCONES (✓ e ✗) E TOOLTip/LEGENDA -->
-                    <div style="
-                        display: grid;
-                        grid-template-columns: 3fr 1fr 1fr 40px;
-                        gap: 8px;
-                        align-items: center;
-                        padding: 8px 0 4px 12px;
-                        margin-left: 12px;
-                        font-size: 10px;
-                        font-weight: 600;
-                        color: #64748b;
-                        text-transform: uppercase;
-                        letter-spacing: 0.5px;
-                        border-bottom: 1px solid #e2e8f0;
-                    ">
+                    <div class="inventory-section-header">
                         <span>Nome do Sub-Leito</span>
-                        <span style="text-align:center;" title="Cadastrados (✓)">Cad.</span>
-                        <span style="text-align:center;" title="Não Cadastrados (✗)">Não Cad.</span>
+                        <span>Cad.</span>
+                        <span>Não Cad.</span>
                         <span></span>
                     </div>
-                    <!-- LEGENDA PEQUENA PARA CLARIDADE -->
-
                     <div class="sub-bed-container"></div>
                     <button type="button" class="add-sub-bed-btn">+ Adicionar sub-leito</button>
                   `;
-
 
                 const subContainer = groupDiv.querySelector('.sub-bed-container');
                 const addSubBtn = groupDiv.querySelector('.add-sub-bed-btn');
@@ -326,9 +309,9 @@
                     const subRow = document.createElement('div');
                     subRow.className = 'sub-bed-row';
                     subRow.innerHTML = `
-                        <input type="text" class="form-input" placeholder="Nome do sub-leito" value="${nome}" required style="flex: 3;">
-                        <input type="number" class="form-input" placeholder="Cad." value="${cad}" required min="0" style="flex: 1;">
-                        <input type="number" class="form-input" placeholder="Não Cad." value="${naoCad}" required min="0" style="flex: 1;">
+                        <input type="text" class="form-input" placeholder="Nome" value="${nome}" required>
+                        <input type="number" class="form-input" placeholder="0" value="${cad}" required min="0">
+                        <input type="number" class="form-input" placeholder="0" value="${naoCad}" required min="0">
                         <button type="button" class="remove-bed-btn" title="Remover">&times;</button>
                       `;
                     subRow.querySelector('.remove-bed-btn').onclick = () => subRow.remove();
@@ -528,18 +511,15 @@
 
             groupDiv.innerHTML = `
             <div class="bed-type-header">${tipoPrincipal || 'Tipo Personalizado'}</div>
-            <div style="display:flex; gap:8px; align-items:center; padding:0 0 4px 0; margin-left:12px; font-size:10px; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.5px;">
-              <span style="flex:3; padding-left:12px;">Nome do Sub-Leito</span>
-              <span style="flex:1; padding-left:12px;">Cad.</span>
-              <span style="flex:1; padding-left:12px;">Não Cad.</span>
-              <span style="width:40px;"></span>
+            <div class="inventory-section-header">
+              <span>Nome do Sub-Leito</span>
+              <span>Cad.</span>
+              <span>Não Cad.</span>
+              <span></span>
             </div>
             <div class="sub-bed-container"></div>
             <button type="button" class="add-sub-bed-btn">+ Adicionar sub-leito</button>
           `;
-
-
-
 
             const subContainer = groupDiv.querySelector('.sub-bed-container');
             const addSubBtn = groupDiv.querySelector('.add-sub-bed-btn');
@@ -549,9 +529,9 @@
                 const subRow = document.createElement('div');
                 subRow.className = 'sub-bed-row';
                 subRow.innerHTML = `
-                <input type="text" class="form-input" placeholder="Nome do sub-leito" required style="flex: 3;">
-                <input type="number" class="form-input" placeholder="Cad." value="0" required min="0" style="flex: 1;">
-                <input type="number" class="form-input" placeholder="Não Cad." value="0" required min="0" style="flex: 1;">
+                <input type="text" class="form-input" placeholder="Nome" required>
+                <input type="number" class="form-input" placeholder="0" value="0" required min="0">
+                <input type="number" class="form-input" placeholder="0" value="0" required min="0">
                 <button type="button" class="remove-bed-btn" title="Remover">&times;</button>
               `;
                 subRow.querySelector('.remove-bed-btn').onclick = () => subRow.remove();

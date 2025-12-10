@@ -91,92 +91,96 @@
 
     <div id="add-unit-modal" class="modal">
         <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
-                <h2 id="modal-title" style="font-size:20px;">Adicionar Unidade</h2>
-                <button id="modal-close-btn"
-                    style="background:none; border:none; font-size:28px; cursor:pointer;">&times;</button>
+            <div class="modal-header">
+                <h2 id="modal-title">Adicionar Unidade</h2>
+                <button id="modal-close-btn" class="modal-close">&times;</button>
             </div>
             <form id="add-unit-form">
-                <input type="hidden" id="unit-id-hidden">
+                <div class="modal-body">
+                    <input type="hidden" id="unit-id-hidden">
 
-                <div class="form-group">
-                    <label>Selecione uma Unidade</label>
-                    <select id="unit-template" class="form-select">
-                        <option value="">-- Ou preencha manualmente abaixo --</option>
-                        <optgroup label="SPAs">
-                            <option value="spa-alvorada">SPA ALVORADA</option>
-                            <option value="spa-coroado">SPA COROADO</option>
-                            <option value="spa-zona-sul">SPA ZONA SUL</option>
-                            <option value="spa-eliameme">SPA ELIAMEME RODRIGUES MADY</option>
-                            <option value="spa-joventina">SPA JOVENTINA DIAS</option>
-                            <option value="spa-chapot">SPA CHAPOT PREVOST</option>
-                            <option value="spa-jose-lins">SPA JOSE LINS</option>
-                            <option value="spa-danilo">SPA DANILO CORREA</option>
-                            <option value="spa-sao-raimundo">SPA SÃO RAIMUNDO</option>
-                        </optgroup>
-                        <optgroup label="Fundações">
-                            <option value="fundacao-hemoam">FUNDAÇÃO HEMOAM</option>
-                            <option value="fuham">FUHAM</option>
-                            <option value="fundacao-adriano-jorge">FUNDAÇÃO HOSPITAL ADRIANO JORGE</option>
-                            <option value="fundacao-medicina-tropical">FUNDAÇÃO DE MEDICINA TROPICAL</option>
-                        </optgroup>
-                        <optgroup label="Maternidades">
-                            <option value="maternidade-antenor-barbosa">Maternidade Antenor Barbosa</option>
-                            <option value="maternidade-ana-braga">Maternidade Ana Braga</option>
-                            <option value="maternidade-azilda-marreiro">Maternidade Azilda Marreiro</option>
-                            <option value="maternidade-nazira-daou">Maternidade Nazira Daou</option>
-                            <option value="maternidade-balbina-mestrinho">Maternidade Balbina Mestrinho</option>
-                            <option value="maternidade-chapot-prevost">Maternidade Chapot Prevost</option>
-                            <option value="maternidade-alvorada">Maternidade Alvorada</option>
-                        </optgroup>
-                        <optgroup label="HPSs">
-                            <option value="hps-28-de-agosto">HPS 28 DE AGOSTO</option>
-                            <option value="hps-zona-norte-delphina-aziz">HPS ZONA NORTE DELPHINA AZIZ</option>
-                            <option value="hps-joao-lucio">HPS JOAO LUCIO</option>
-                            <option value="hps-platao-araujo">HPS PLATAO ARAUJO</option>
-                            <option value="hospital-geraldo-da-rocha">HOSPITAL GERALDO DA ROCHA</option>
-                        </optgroup>
-                        <optgroup label="HPSCs">
-                            <option value="hpsc-zona-oeste">HPSC ZONA OESTE</option>
-                            <option value="hpsc-zona-sul">HPSC ZONA SUL</option>
-                            <option value="hpsc-zona-leste">HPSC ZONA LESTE</option>
-                        </optgroup>
-                        <optgroup label="UPAs">
-                            <option value="upa-jose-rodrigues">UPA José Rodrigues</option>
-                            <option value="upa-campos-sales">Upa Campos Sales</option>
-                        </optgroup>
-                    </select>
+                    <div class="form-group">
+                        <label>Selecione uma Unidade</label>
+                        <select id="unit-template" class="form-select">
+                            <option value="">-- Ou preencha manualmente abaixo --</option>
+                            <optgroup label="SPAs">
+                                <option value="spa-alvorada">SPA ALVORADA</option>
+                                <option value="spa-coroado">SPA COROADO</option>
+                                <option value="spa-zona-sul">SPA ZONA SUL</option>
+                                <option value="spa-eliameme">SPA ELIAMEME RODRIGUES MADY</option>
+                                <option value="spa-joventina">SPA JOVENTINA DIAS</option>
+                                <option value="spa-chapot">SPA CHAPOT PREVOST</option>
+                                <option value="spa-jose-lins">SPA JOSE LINS</option>
+                                <option value="spa-danilo">SPA DANILO CORREA</option>
+                                <option value="spa-sao-raimundo">SPA SÃO RAIMUNDO</option>
+                            </optgroup>
+                            <optgroup label="Fundações">
+                                <option value="fundacao-hemoam">FUNDAÇÃO HEMOAM</option>
+                                <option value="fuham">FUHAM</option>
+                                <option value="fundacao-adriano-jorge">FUNDAÇÃO HOSPITAL ADRIANO JORGE</option>
+                                <option value="fundacao-medicina-tropical">FUNDAÇÃO DE MEDICINA TROPICAL</option>
+                            </optgroup>
+                            <optgroup label="Maternidades">
+                                <option value="maternidade-antenor-barbosa">Maternidade Antenor Barbosa</option>
+                                <option value="maternidade-ana-braga">Maternidade Ana Braga</option>
+                                <option value="maternidade-azilda-marreiro">Maternidade Azilda Marreiro</option>
+                                <option value="maternidade-nazira-daou">Maternidade Nazira Daou</option>
+                                <option value="maternidade-balbina-mestrinho">Maternidade Balbina Mestrinho</option>
+                                <option value="maternidade-chapot-prevost">Maternidade Chapot Prevost</option>
+                                <option value="maternidade-alvorada">Maternidade Alvorada</option>
+                            </optgroup>
+                            <optgroup label="HPSs">
+                                <option value="hps-28-de-agosto">HPS 28 DE AGOSTO</option>
+                                <option value="hps-zona-norte-delphina-aziz">HPS ZONA NORTE DELPHINA AZIZ</option>
+                                <option value="hps-joao-lucio">HPS JOAO LUCIO</option>
+                                <option value="hps-platao-araujo">HPS PLATAO ARAUJO</option>
+                                <option value="hospital-geraldo-da-rocha">HOSPITAL GERALDO DA ROCHA</option>
+                            </optgroup>
+                            <optgroup label="HPSCs">
+                                <option value="hpsc-zona-oeste">HPSC ZONA OESTE</option>
+                                <option value="hpsc-zona-sul">HPSC ZONA SUL</option>
+                                <option value="hpsc-zona-leste">HPSC ZONA LESTE</option>
+                            </optgroup>
+                            <optgroup label="UPAs">
+                                <option value="upa-jose-rodrigues">UPA José Rodrigues</option>
+                                <option value="upa-campos-sales">Upa Campos Sales</option>
+                            </optgroup>
+                        </select>
+                    </div>
 
-                </div>
+                    <div class="form-group">
+                        <label>Nome da Unidade</label>
+                        <input type="text" id="unit-name" class="form-input" placeholder="Ex: HPS 28 de Agosto"
+                            required />
+                        <small id="name-feedback"></small>
+                    </div>
 
-                <div class="form-group">
-                    <label>Nome da Unidade</label>
-                    <input type="text" id="unit-name" class="form-input" placeholder="Ex: HPS 28 de Agosto" required />
-                    <small id="name-feedback"></small>
-                </div>
+                    <div class="form-group">
+                        <label>Categoria</label>
+                        <select id="unit-category" class="form-select" required>
+                            <option value="HPS">HPS</option>
+                            <option value="HPSC">HPSC</option>
+                            <option value="Maternidade">Maternidade</option>
+                            <option value="Infantil">Infantil</option>
+                            <option value="UPA">UPA</option>
+                            <option value="Fundação">Fundação</option>
+                            <option value="SPA">SPA</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label>Categoria</label>
-                    <select id="unit-category" class="form-select" required>
-                        <option value="HPS">HPS</option>
-                        <option value="HPSC">HPSC</option>
-                        <option value="Maternidade">Maternidade</option>
-                        <option value="Infantil">Infantil</option>
-                        <option value="UPA">UPA</option>
-                        <option value="Fundação">Fundação</option>
-                        <option value="SPA">SPA</option>
-                        <option value="Outro">Outro</option>
-                    </select>
+                    <div class="form-group">
+                        <label>Inventário de Leitos <span class="hint">(Clique no X para excluir)</span></label>
+                        <div id="bed-inventory-inputs"></div>
+                        <button type="button" id="add-bed-input" class="add-sub-bed-btn"
+                            style="margin-top:16px; border-style:solid;">
+                            + Adicionar Tipo de Leito
+                        </button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Inventário <span style="font-size:12px; color:#64748b; font-weight:400;">(Clique no X
-                            vermelho para excluir um tipo)</span></label>
-                    <div id="bed-inventory-inputs"></div>
-                    <button type="button" id="add-bed-input"
-                        style="margin-top:10px; padding:10px; width:100%; border:1px dashed #ccc; background:#f8fafc; border-radius:8px; cursor:pointer; font-weight:500;">+
-                        Adicionar Tipo de Leito</button>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-save">Salvar Alterações</button>
                 </div>
-                <button type="submit" class="btn-save">Salvar Alterações</button>
             </form>
         </div>
     </div>
