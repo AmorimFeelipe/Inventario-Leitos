@@ -309,7 +309,7 @@
                     const subRow = document.createElement('div');
                     subRow.className = 'sub-bed-row';
                     subRow.innerHTML = `
-                        <input type="text" class="form-input sub-bed-name" placeholder="Nome do sub-leito (ex: Enfermaria, UCI)" value="${nome}">
+                        <input type="text" class="form-input sub-bed-name" placeholder="Sub-leito (ex: Enfermaria)" value="${nome}">
                         <div class="number-field">
                             <label class="number-label">Cadastrados</label>
                             <input type="number" class="form-input" placeholder="0" value="${cad}" min="0" onfocus="this.select()">
@@ -472,7 +472,7 @@
         overlay.onclick = closeSidebar;
 
         document.getElementById('modal-close-btn').onclick = () => modal.classList.remove('active');
-        document.getElementById('add-bed-input').onclick = () => createBedTypeGroup('Novo Tipo de Leito');
+        document.getElementById('add-bed-input').onclick = () => createBedTypeGroup('', true);
 
         // Auto-preenchimento ao selecionar template de unidade
         document.getElementById('unit-template').onchange = (e) => {
@@ -510,13 +510,18 @@
         };
 
         // Função para criar grupo de tipo com sub-leitos (agora usada para todos)
-        function createBedTypeGroup(tipoPrincipal) {
+        function createBedTypeGroup(tipoPrincipal, editavel = false) {
             const groupDiv = document.createElement('div');
             groupDiv.className = 'bed-type-group';
             groupDiv.dataset.tipo = tipoPrincipal || 'Tipo Personalizado';
 
+            // Se for editável, mostra input; senão, mostra texto fixo
+            const headerContent = editavel
+                ? `<input type="text" class="bed-type-input" value="${tipoPrincipal || ''}" placeholder="ex: Clínico, Cirúrgico...">`
+                : tipoPrincipal || 'Tipo Personalizado';
+
             groupDiv.innerHTML = `
-            <div class="bed-type-header">${tipoPrincipal || 'Tipo Personalizado'}</div>
+            <div class="bed-type-header">${headerContent}</div>
             <div class="inventory-section-header">
               <span>Nome do Sub-Leito</span>
               <span>Cad.</span>
@@ -527,6 +532,14 @@
             <button type="button" class="add-sub-bed-btn">+ Adicionar sub-leito</button>
           `;
 
+            // Se editável, atualiza o dataset quando o input mudar
+            if (editavel) {
+                const inputTipo = groupDiv.querySelector('.bed-type-input');
+                inputTipo.oninput = () => {
+                    groupDiv.dataset.tipo = inputTipo.value.trim() || 'Tipo Personalizado';
+                };
+            }
+
             const subContainer = groupDiv.querySelector('.sub-bed-container');
             const addSubBtn = groupDiv.querySelector('.add-sub-bed-btn');
 
@@ -535,7 +548,7 @@
                 const subRow = document.createElement('div');
                 subRow.className = 'sub-bed-row';
                 subRow.innerHTML = `
-                <input type="text" class="form-input sub-bed-name" placeholder="Nome do sub-leito (ex: Enfermaria, UCI)">
+                <input type="text" class="form-input sub-bed-name" placeholder="Sub-leito (ex: Enfermaria)">
                 <div class="number-field">
                     <label class="number-label">Cadastrados</label>
                     <input type="number" class="form-input" placeholder="0" value="0" min="0" onfocus="this.select()">

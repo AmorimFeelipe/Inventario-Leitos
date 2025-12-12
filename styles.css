@@ -551,6 +551,28 @@
                 font-size: 14px;
             }
 
+            /* Input editável no header do tipo */
+            .bed-type-header .bed-type-input {
+                flex: 1;
+                background: rgba(255, 255, 255, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.4);
+                border-radius: 6px;
+                padding: 8px 10px;
+                font-size: 12px;
+                font-weight: 600;
+                color: white;
+                outline: none;
+            }
+
+            .bed-type-header .bed-type-input::placeholder {
+                color: rgba(255, 255, 255, 0.7);
+            }
+
+            .bed-type-header .bed-type-input:focus {
+                background: rgba(255, 255, 255, 0.3);
+                border-color: white;
+            }
+
             .sub-bed-container {
                 padding: 10px;
                 gap: 10px;
@@ -699,7 +721,7 @@
 
             /* ---- BOTÃO ADICIONAR SUB-LEITO ---- */
             .add-sub-bed-btn {
-                margin: 10px;
+                margin: 10px 0;
                 padding: 14px;
                 font-size: 13px;
                 font-weight: 600;
