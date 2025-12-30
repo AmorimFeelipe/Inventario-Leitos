@@ -220,54 +220,82 @@
 
             filtered.forEach(unit => {
                 const card = document.createElement('div');
-                card.className = 'unit-card';
+                card.className = 'terminal-card'; // Mudado para nova classe
 
                 const total = unit.inventory ? unit.inventory.reduce((a, b) => a + (+b.quantity || 0), 0) : 0;
-                const totalNaoCad = unit.inventory ? unit.inventory.reduce((a, b) => a + (+b.naoCadastrados || 0), 0) : 0;
+                
+                // Separar listas
+                const registeredList = [];
+                const nonRegisteredList = [];
+                
+                let totalRegistered = 0;
+                let totalNonRegistered = 0;
+
+                if (unit.inventory) {
+                    unit.inventory.forEach(item => {
+                        const qtd = item.quantity || 0;
+                        const naoCad = item.naoCadastrados || 0;
+                        const cad = item.cadastrados !== undefined ? item.cadastrados : (qtd - naoCad);
+
+                        if (cad > 0) {
+                            registeredList.push({ type: item.type, count: cad });
+                            totalRegistered += cad;
+                        }
+                        if (naoCad > 0) {
+                            nonRegisteredList.push({ type: item.type, count: naoCad });
+                            totalNonRegistered += naoCad;
+                        }
+                    });
+                }
+
+                // Helper para gerar linhas de dots
+                const createDotRow = (label, value, isNc = false) => `
+                    <div class="dot-leader-row">
+                        <span class="dot-leader-label">${label}</span>
+                        <div class="dot-leader-fill"></div>
+                        <span class="dot-leader-value ${isNc ? 'term-value-nc' : ''}">${value}</span>
+                    </div>
+                `;
 
                 card.innerHTML = `
-            <div class="card-header-row">
-                <div class="unit-info">
-                    <h3>${unit.name || 'Sem nome'}</h3>
-                    <span class="unit-cat">${unit.category || 'Sem categoria'}</span>
-                </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <div class="total-badge">${total}<span>Leitos</span></div>
-                    ${totalNaoCad > 0 ? `<div class="total-badge" style="background: #fee2e2; color: #dc2626;">${totalNaoCad}<span style="color: #dc2626;">Não Cad.</span></div>` : ''}
-                </div>
-            </div>
+                    <div class="term-header">
+                        <div class="term-title">${unit.name || 'Sem nome'}</div>
+                        <div class="term-total-line">
+                            <span>Total de leitos:</span>
+                            <span class="term-highlight">${total}</span>
+                        </div>
+                    </div>
 
-            <div class="types-list">
-                ${unit.inventory ? unit.inventory.map(i => {
-                    const naoCad = i.naoCadastrados || 0;
-                    const cad = i.cadastrados !== undefined ? i.cadastrados : (i.quantity || 0);
-                    
-                    // Formato limpo: só quantidade se todos cadastrados, ou ícones se houver não cadastrados
-                    let detalhamento;
-                    if (naoCad > 0) {
-                        detalhamento = `<span style="color:#16a34a;">✓${cad}</span> <span style="color:#dc2626;">✗${naoCad}</span>`;
-                    } else {
-                        detalhamento = `<b>${cad}</b>`;
-                    }
-                    
-                    return `<span class="type-tag tag-cli">
-                        ${i.type || 'Sem nome'}: ${detalhamento}
-                    </span>`;
-                }).join('') : ''}
-            </div>
+                    <div class="term-body">
+                        <!-- CADASTRADOS -->
+                        <div class="term-section">
+                            <div class="term-section-title cadastrados">LEITOS <span>CADASTRADOS</span> (CNES)</div>
+                            <div class="term-list">
+                                ${registeredList.length > 0 
+                                    ? registeredList.map(i => createDotRow(i.type, i.count)).join('') 
+                                    : '<div style="font-size:11px; opacity:0.5; padding-left:10px;">Nenhum leito cadastrado.</div>'}
+                            </div>
+                        </div>
 
-            <!-- RODAPÉ COM LEGENDA E AÇÕES -->
-            <div style="margin-top:auto; padding-top:15px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
-                <div style="display:flex; gap:12px; align-items:center;">
-                    <span style="font-size:10px; color:#94a3b8;">Ref: ${unit.id?.substring(0, 8) || 'temp'}</span>
-                    ${totalNaoCad > 0 ? `<span style="font-size:9px; color:#64748b;"><span style="color:#16a34a;">✓</span>Cad. <span style="color:#dc2626;">✗</span>N.Cad.</span>` : ''}
-                </div>
-                <div class="card-actions">
-                    <button class="btn-icon-card btn-edit" title="Editar / Excluir Leitos">✏️</button>
-                    <button class="btn-icon-card btn-del" title="Excluir Unidade">🗑️</button>
-                </div>
-            </div>
-        `;
+                        <!-- NÃO CADASTRADOS (Só mostra se houver) -->
+                        ${nonRegisteredList.length > 0 ? `
+                        <div class="term-section">
+                            <div class="term-section-title nao-cadastrados">LEITOS <span>NÃO CADASTRADOS</span> (CNES)</div>
+                            <div class="term-list">
+                                ${nonRegisteredList.map(i => createDotRow(i.type, i.count, true)).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="term-footer">
+                        <div style="font-family: inherit;">Ref: ${unit.id?.substring(0, 8) || '...'}</div>
+                        <div class="term-actions">
+                            <button class="term-btn btn-edit">✏️ Editar</button>
+                            <button class="term-btn btn-del">🗑️ Excluir</button>
+                        </div>
+                    </div>
+                `;
 
                 // Eventos dos botões
                 card.querySelector('.btn-edit').onclick = () => openEditModal(unit);

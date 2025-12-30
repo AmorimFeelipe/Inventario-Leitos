@@ -1255,3 +1255,181 @@
                 border-radius: 6px;
             }
         }
+
+        /* ============================================
+           NOVO LAYOUT: LISTA HARMONIZADA
+           ============================================ */
+
+        /* Aproveitando variáveis existentes do app */
+        .terminal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: "Inter", sans-serif; /* Fonte padrão do app */
+            color: var(--text-primary);
+        }
+        
+        .terminal-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        /* Cabeçalho do Card */
+        .term-header {
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .term-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            /* text-transform: uppercase; Removido para ficar mais limpo */
+        }
+
+        .term-total-line {
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .term-highlight {
+            background: var(--accent-light);
+            color: var(--accent-dark);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        /* Seções de Leitos */
+        .term-section {
+            margin-bottom: 20px;
+        }
+
+        .term-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid var(--border-light);
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .term-section-title.cadastrados {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-light);
+        }
+
+        .term-section-title.nao-cadastrados {
+            color: var(--danger);
+            border-bottom-color: var(--danger-light);
+            margin-top: 10px;
+        }
+
+        /* Lista com Leaders (pontinhos) */
+        .term-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .dot-leader-row {
+            display: flex;
+            align-items: flex-end;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .dot-leader-label {
+            white-space: nowrap;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .dot-leader-fill {
+            flex-grow: 1;
+            border-bottom: 2px dotted #e2e8f0; /* Pontilhado suave */
+            margin: 0 8px;
+            position: relative;
+            top: -5px; 
+            min-width: 20px;
+        }
+
+        .dot-leader-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .term-value-nc {
+            color: var(--danger);
+        }
+        
+        /* Rodapé do Card */
+        .term-footer {
+            margin-top: auto;
+            border-top: 1px solid var(--border-light);
+            padding-top: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .term-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .term-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .term-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            background-color: var(--accent-light);
+        }
+
+        .btn-del:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            background-color: var(--danger-light);
+        }
+
+        /* Ajuste do grid para os novos cards */
+        .grid-view {
+            gap: 20px;
+        }
+
+        @media (max-width: 400px) {
+            .term-title { font-size: 15px; }
+            .dot-leader-row { font-size: 13px; }
+        }
